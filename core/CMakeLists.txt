@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.12)
 
 include(CMakeLists.var)
 include(${CMAKE_SOURCE_DIR}/cmake/Cmake.cmake)
@@ -44,11 +44,16 @@ endif()
 
 if(module_external_dependency)
     foreach(dependency ${module_external_dependency})
-        string(REPLACE "::" ";" namespaceTarget ${dependency})
-        list(GET namespaceTarget 0 namespace)
-        find_package(${namespace} REQUIRED)
-        target_link_libraries(${module_name} ${dependency})
+        AddExternalDependency(${module_name} ${dependency})
     endforeach()
+endif()
+
+if(module_tests)
+    add_executable(${module_name}_test ${module_tests})
+    enable_testing()
+    find_package(GTest REQUIRED)
+    target_link_libraries(${module_name}_test PRIVATE GTest::GTest GTest::Main)
+    add_test(AllTestsInMain ${module_name}_test)
 endif()
 
 

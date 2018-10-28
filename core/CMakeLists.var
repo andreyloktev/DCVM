@@ -3,7 +3,7 @@
 set(module_name core)
 
 # Module type(library or executable. Default is library)
-set(module_type executable)
+set(module_type library)
 
 # Public module headers
 set(module_public_headers
@@ -23,12 +23,16 @@ set(module_sources
 set(module_defines
 )
 
+#Module tests
+set(module_tests
+    test/foo_test.cpp
+)
+
 # Module dependency
 set(module_dependency
 )
 
 # Module external dependency(get via vcpkg)
 set(module_external_dependency
-    cpprestsdk::cpprest
-#    gtest
+    cpprestsdk_cpprest
 )
