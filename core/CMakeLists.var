@@ -1,0 +1,34 @@
+
+# Module name (REQUIRED)
+set(module_name core)
+
+# Module type(library or executable. Default is library)
+set(module_type executable)
+
+# Public module headers
+set(module_public_headers
+    include/foo.hpp
+)
+
+# Private module headers
+set(module_private_headers
+)
+
+# Module sources
+set(module_sources
+    src/foo.cpp
+)
+
+# Module defines
+set(module_defines
+)
+
+# Module dependency
+set(module_dependency
+)
+
+# Module external dependency(get via vcpkg)
+set(module_external_dependency
+    cpprestsdk::cpprest
+#    gtest
+)

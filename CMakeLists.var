@@ -1,0 +1,8 @@
+
+set(projectName
+    DCVM
+)
+
+set(components
+    core
+)
