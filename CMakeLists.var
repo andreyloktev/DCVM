@@ -5,4 +5,5 @@ set(projectName
 
 set(components
     core
+    test
 )

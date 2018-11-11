@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 include(CMakeLists.var)
 include(${CMAKE_SOURCE_DIR}/cmake/Cmake.cmake)
 
@@ -21,16 +23,17 @@ else()
 endif()
 
 target_include_directories(${module_name} PRIVATE "${CMAKE_SOURCE_DIR}/${module_name}/include")
+target_include_directories(${module_name} PRIVATE "${CMAKE_SOURCE_DIR}/${module_name}/src/h")
 
 #Group files in a IDE
-GroupFiles(${module_sources})
+GroupFiles(module_sources)
 
 if(module_public_headers)
-    GroupFiles(${module_public_headers})
+    GroupFiles(module_public_headers)
 endif()
 
 if(module_private_headers)
-    GroupFiles(${module_private_headers})
+    GroupFiles(module_private_headers)
 endif()
 ##################################
 

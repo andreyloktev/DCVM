@@ -7,7 +7,11 @@ set(module_type library)
 
 # Public module headers
 set(module_public_headers
-    include/foo.hpp
+    include/dcvm.h
+    include/dcvm/DCVMCloudDiskType.h
+    include/dcvm/DCVMError.h
+    include/dcvm/DCVMLogger.h
+    include/dcvm/DCVMTypes.h
 )
 
 # Private module headers
@@ -16,7 +20,7 @@ set(module_private_headers
 
 # Module sources
 set(module_sources
-    src/foo.cpp
+    src/dcvm.cpp
 )
 
 # Module defines
