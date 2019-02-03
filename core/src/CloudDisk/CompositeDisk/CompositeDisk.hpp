@@ -10,14 +10,26 @@ namespace compositedisk {
 
 class CompositeDisk final : public ICloudDiskControl, public ICloudDisk
 {
-    std::vector<std::shared_ptr<ICloudDisk>> m_pDisks;
+    unsigned long m_reffCnt = 1;
+    std::vector<ICloudDisk*> m_disks;
 public:
     CompositeDisk() = default;
-    CompositeDisk(const CompositeDisk&) = default;
-    CompositeDisk& operator=(const CompositeDisk&) = default;
+    CompositeDisk(const CompositeDisk&) = delete;
+    CompositeDisk& operator=(const CompositeDisk&) = delete;
+    ~CompositeDisk() noexcept;
+
+    /*!
+     * Add disk to cloud disk set. This method is only actual for CompositeDisk.
+     * @param [in] pDisk disk to add.
+    */
+    void AddDisk(ICloudDisk *pDisk) noexcept;
+
+    //ICloudDiskBase interface implementation.
+    DCVMError QueryInterface(CloudDiskInterface type, void* &pInstance) noexcept override;
+    unsigned long AddReff() noexcept override;
+    unsigned long Release() noexcept override;
 
     DCVMError LogIn(const DCVMString_t &authorizationCode) noexcept override;
-    void AddDisk(const std::shared_ptr<ICloudDisk> &pDisk) noexcept override;
 };
 
 } // namespace compositedisk

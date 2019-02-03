@@ -23,15 +23,16 @@ struct CloudDiskControl
      * Get access and refresh tokens to cloud resource and return initialized cloud disk.
      * @param [in] type type of cloud disk to create.
      * @param [in] authorizationCode authorization code to get access and refresh tokens.
-     * @param [in] pParentDisk if it is not null then created pDisk will be added to cloud disk set of parent disk (OPTIONAL).
+     * @param [in] pRightHandDisk   if it is not null then pDisk will be CompositeDisk, 
+     *                              new created disk will be first in the list, RightHandDisk will be next (OPTIONAL).
      * @param [out] pDisk the new intialized cloud disk.
      * @return error code.
     */
-    DCVMError LogIn(
+    static DCVMError LogIn(
         const DCVMCloudDiskType         type
         , const DCVMString_t            &authorizationCode
-        , std::shared_ptr<ICloudDisk>   pParentDisk
-        , std::shared_ptr<ICloudDisk>   &pDisk
+        , ICloudDisk                    *pRightHandDisk
+        , ICloudDisk*                   &pDisk
     ) noexcept;
 };
 

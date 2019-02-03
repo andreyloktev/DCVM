@@ -29,8 +29,8 @@ DCVMString_t CloudDiskControl::GetOAuthUrlToLogIn(const DCVMCloudDiskType type) 
 DCVMError CloudDiskControl::LogIn(
     const DCVMCloudDiskType         type
     , const DCVMString_t            &authorizationCode
-    , std::shared_ptr<ICloudDisk>   pParentDisk
-    , std::shared_ptr<ICloudDisk>   &pDisk
+    , ICloudDisk                    *pRightHandDisk
+    , ICloudDisk*                   &pDisk
 ) noexcept
 {
     if (authorizationCode.empty())
@@ -42,29 +42,66 @@ DCVMError CloudDiskControl::LogIn(
 
     try
     {
-        if (pParentDisk)
+        switch (type)
         {
-            pDisk.reset(new(std::nothrow) compositedisk::CompositeDisk);
+        case DCVMCloudDiskType::AmazonCloudDrive:
+        {
+            return DCVM_ERR_NOT_IMPLEMENTED;
+        }
+        case DCVMCloudDiskType::DropBoxDrive:
+        {
+            return DCVM_ERR_NOT_IMPLEMENTED;
+        }
+        case DCVMCloudDiskType::GoogleDrive:
+        {
+            return DCVM_ERR_NOT_IMPLEMENTED;
+        }
+        case DCVMCloudDiskType::OneDrive:
+        {
+            return DCVM_ERR_NOT_IMPLEMENTED;
+        }
+        case DCVMCloudDiskType::YandexDisk:
+        {
+            pDisk = new(std::nothrow) yandex::YandexDisk;
+            break;
+        }
+        }
+        
+        if (nullptr == pDisk)
+        {
+            DCVM_ERROR_TRACE(DCVM_ERR_INSUFFICIENT_RESOURCES, DCVMErrorToString(DCVM_ERR_INSUFFICIENT_RESOURCES));
+            return DCVM_ERR_INSUFFICIENT_RESOURCES;
+        }
+
+        DCVMError err = pDisk->LogIn(authorizationCode);
+        if (DCVM_FAILED(err))
+        {
+            DCVM_ERROR_TRACE(err, DCVMErrorToString(err));
+            return err;
+        }
+
+        if (pRightHandDisk)
+        {
+            compositedisk::CompositeDisk *pCompositeDisk = new(std::nothrow) compositedisk::CompositeDisk;
             if (nullptr == pDisk)
             {
+                pDisk->Release();
                 DCVM_ERROR_TRACE(DCVM_ERR_INSUFFICIENT_RESOURCES);
                 return DCVM_ERR_INSUFFICIENT_RESOURCES;
             }
 
-            pDisk->AddDisk(pParentDisk);
+            pCompositeDisk->AddDisk(pDisk);
+            pCompositeDisk->AddDisk(pRightHandDisk);
+            pDisk = pCompositeDisk;
         }
-        else
-        {
-            
-        }
-
-
     }
     catch (std::exception&)
     {
         DCVM_ERROR_TRACE(DCVM_ERR_INTERNAL);
         return DCVM_ERR_INTERNAL;
     }
+
+    return DCVM_ERR_SUCCESS;
 }
 
 } // namespace clouddisk

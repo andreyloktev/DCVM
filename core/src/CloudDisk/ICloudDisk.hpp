@@ -3,6 +3,7 @@
 
 #include <dcvm/DCVMError.h>
 #include <dcvm_types.hpp>
+#include "ICloudDiskBase.hpp"
 
 namespace dcvm {
 namespace clouddisk {
@@ -10,13 +11,8 @@ namespace clouddisk {
 /*!
  * @class ICloudDisk is interface which lets to work with one or several cloud disk.
 */
-struct ICloudDisk
+struct ICloudDisk : public ICloudDiskBase
 {
-    /*!
-     * Add disk to cloud disk set. This method is only actual for CompositeDisk.
-     * @param [in] pDisk disk to add.
-    */
-    virtual void AddDisk(const std::shared_ptr<ICloudDisk> &pDisk) noexcept = 0;
 };
 
 } // namespace clouddisk

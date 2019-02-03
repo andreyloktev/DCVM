@@ -16,11 +16,20 @@ set(module_public_headers
 
 # Private module headers
 set(module_private_headers
+    src/CloudDisk/ICloudDiskBase.hpp
+    src/CloudDisk/ICloudDiskControl.hpp
+    src/CloudDisk/ICloudDisk.hpp
+    src/CloudDisk/CloudDiskControl.hpp
+    src/CloudDisk/CompositeDisk/CompositeDisk.hpp
+    src/CloudDisk/Yandex/YandexDisk.hpp
 )
 
 # Module sources
 set(module_sources
     src/dcvm.cpp
+    src/CloudDisk/CloudDiskControl.cpp
+    src/CloudDisk/CompositeDisk/CompositeDisk.cpp
+    src/CloudDisk/Yandex/YandexDisk.cpp
 )
 
 # Module defines

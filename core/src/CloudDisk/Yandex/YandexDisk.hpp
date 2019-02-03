@@ -16,11 +16,9 @@ public:
     static DCVMString_t GetOAuthUrlToLogIn();
 public:
     YandexDisk() = default;
-    YandexDisk(const YandexDisk&) = default;
-    YandexDisk& operator=(const YandexDisk&) = default;
+    YandexDisk(const YandexDisk&) = delete;
+    YandexDisk& operator=(const YandexDisk&) = delete;
     
-    //Do nothing
-    void AddDisk(const std::shared_ptr<ICloudDisk> &pDisk) noexcept override;
     DCVMError LogIn(const DCVMString_t &authorizationCode) noexcept override;
 };
 
