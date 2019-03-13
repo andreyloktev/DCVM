@@ -1,0 +1,52 @@
+
+# Module name (REQUIRED)
+set(module_name dcvm)
+
+# Module type(library or executable. Default is library)
+set(module_type library)
+
+# Public module headers
+set(module_public_headers
+    include/dcvm.h
+    include/dcvm/DCVMError.h
+    include/dcvm/DCVMLogger.h
+    include/dcvm/DCVMTypes.h
+    include/dcvm/DCVMCloudStorage.h
+)
+
+# Private module headers
+set(module_private_headers
+    src/CloudDisk/ICloudDiskBase.hpp
+    src/CloudDisk/ICloudDiskControl.hpp
+    src/CloudDisk/ICloudDisk.hpp
+    src/CloudDisk/CloudDiskControl.hpp
+    src/CloudDisk/CompositeDisk/CompositeDisk.hpp
+    src/CloudDisk/Yandex/YandexDisk.hpp
+)
+
+# Module sources
+set(module_sources
+    src/dcvm.cpp
+    src/CloudDisk/CloudDiskControl.cpp
+    src/CloudDisk/CompositeDisk/CompositeDisk.cpp
+    src/CloudDisk/Yandex/YandexDisk.cpp
+)
+
+# Module defines
+set(module_defines
+)
+
+#Module tests
+set(module_tests
+    test/foo_test.cpp
+)
+
+# Module dependency
+set(module_dependency
+    eastl
+)
+
+# Module external dependency(get via vcpkg)
+set(module_external_dependency
+    cpprestsdk_cpprest
+)

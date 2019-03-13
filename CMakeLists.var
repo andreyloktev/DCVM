@@ -4,6 +4,7 @@ set(projectName
 )
 
 set(components
-    core
+    eastl
+    dcvm
     test
 )
