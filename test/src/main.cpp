@@ -3,6 +3,9 @@
 #include <cpprest/json.h>
 #include <Windows.h>
 
+//access_toke: AQAAAAACBOwDAAVEODrB-wFqbk_etvcqyc-uLho
+//token_type: bearer
+
 const utility::string_t YANDEX_OATH_HOST    = U("https://oauth.yandex.ru");
 
 int main(int argv, const char **ppArgc)
@@ -19,7 +22,7 @@ int main(int argv, const char **ppArgc)
             request.headers().add(U("Host"), U("oauth.yandex.ru"));
             request.headers().add(U("Content-type"), U("application/x-www-form-urlencoded"));
             
-            utf16string body = U("grant_type=authorization_code&code=9225691&client_id=c8d081cd444947008587f4a277a942b4&client_secret=dc1ea6049ef34a51a6ae06a2a7ad6e6f");
+            utf16string body = U("grant_type=authorization_code&code=2884410&client_id=c8d081cd444947008587f4a277a942b4&client_secret=dc1ea6049ef34a51a6ae06a2a7ad6e6f");
             request.set_body(body);
 
             web::uri_builder uriBuilder(U("/token"));
