@@ -1,11 +1,16 @@
-#ifndef DCVM_CORE_DCVMTYPES_H_
-#define DCVM_CORE_DCVMTYPES_H_
+#ifndef DCVM_DCVM_DCVMTYPES_H_
+#define DCVM_DCVM_DCVMTYPES_H_
 
 #ifdef _WIN32
 typedef wchar_t dcvm_char_t;
 #else
 typedef char dcvm_char_t; 
 #endif
+
+#define DCVM_TRUE   1
+#define DCVM_FALSE  0
+
+typedef unsigned char       dcvm_bool_t;
 
 typedef unsigned char       dcvm_uint8_t;
 typedef unsigned short      dcvm_uint16_t;

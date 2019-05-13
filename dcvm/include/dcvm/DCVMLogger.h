@@ -1,5 +1,5 @@
-#ifndef DCVM_CORE_DCVMLOGGER_H_
-#define DCVM_CORE_DCVMLOGGER_H_
+#ifndef DCVM_DCVM_DCVMLOGGER_H_
+#define DCVM_DCVM_DCVMLOGGER_H_
 
 #include "DCVMError.h"
 

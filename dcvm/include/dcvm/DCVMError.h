@@ -1,5 +1,5 @@
-#ifndef DCVM_CORE_DCVMERROR_H_
-#define DCVM_CORE_DCVMERROR_H_
+#ifndef DCVM_DCVM_DCVMERROR_H_
+#define DCVM_DCVM_DCVMERROR_H_
 
 #ifndef UNREFERENCED_PARAMETER
 #define UNREFERENCED_PARAMETER(P) (P)
@@ -12,7 +12,7 @@
 #define DCVM_SUCCESS(err) (!IS_DCVM_ERROR((err)))
 #define DCVM_FAILED(err) (IS_DCVM_ERROR((err)))
 
-enum DCVMError
+enum DCVM_ERROR
 {
     DCVM_ERR_SUCCESS
     , DCVM_ERR_NOT_IMPLEMENTED          = MAKE_DCVM_ERROR(0x1)
@@ -22,6 +22,6 @@ enum DCVMError
     , DCVM_ERR_CANNOT_LOG_IN            = MAKE_DCVM_ERROR(0x5)
 };
 
-const char* DCVMErrorToString(enum DCVMError err);
+const char* DCVMErrorToString(enum DCVM_ERROR err);
 
 #endif

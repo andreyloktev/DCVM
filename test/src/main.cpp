@@ -5,7 +5,6 @@
 
 //access_toke: AQAAAAACBOwDAAVEODrB-wFqbk_etvcqyc-uLho
 //token_type: bearer
-
 const utility::string_t YANDEX_OATH_HOST    = U("https://oauth.yandex.ru");
 
 int main(int argv, const char **ppArgc)

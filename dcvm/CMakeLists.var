@@ -11,7 +11,8 @@ set(module_public_headers
     include/dcvm/DCVMError.h
     include/dcvm/DCVMLogger.h
     include/dcvm/DCVMTypes.h
-    include/dcvm/DCVMCloudStorage.h
+    include/dcvm/DCVMCloudDiskAPI.h
+    include/dcvm/dcvm_system.h
 )
 
 # Private module headers
