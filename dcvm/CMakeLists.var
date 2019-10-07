@@ -7,7 +7,7 @@ set(module_type library)
 
 # Public module headers
 set(module_public_headers
-    include/dcvm.h
+    include/dcvm/dcvm.h
     include/dcvm/DCVMError.h
     include/dcvm/DCVMLogger.h
     include/dcvm/DCVMTypes.h
@@ -17,20 +17,15 @@ set(module_public_headers
 
 # Private module headers
 set(module_private_headers
-    src/CloudDisk/ICloudDiskBase.hpp
-    src/CloudDisk/ICloudDiskControl.hpp
     src/CloudDisk/ICloudDisk.hpp
-    src/CloudDisk/CloudDiskControl.hpp
-    src/CloudDisk/CompositeDisk/CompositeDisk.hpp
-    src/CloudDisk/Yandex/YandexDisk.hpp
+    src/base/DCVMTypes.hpp
+    src/base/EASTLAllocator.hpp
+    src/base/SystemApi.hpp
 )
 
 # Module sources
 set(module_sources
     src/dcvm.cpp
-    src/CloudDisk/CloudDiskControl.cpp
-    src/CloudDisk/CompositeDisk/CompositeDisk.cpp
-    src/CloudDisk/Yandex/YandexDisk.cpp
 )
 
 # Module defines
@@ -49,5 +44,4 @@ set(module_dependency
 
 # Module external dependency(get via vcpkg)
 set(module_external_dependency
-    cpprestsdk_cpprest
 )

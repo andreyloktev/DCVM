@@ -22,4 +22,15 @@ typedef short               dcvm_int16_t;
 typedef int                 dcvm_int32_t;
 typedef long long           dcvm_int64_t;
 
+#ifdef _WIN32
+#ifdef _WIN64
+typedef unsigned long long dcvm_size_t;
+#else
+typedef unsigned int dcvm_size_t;
+#endif
+#else
+#endif
+
+#define DCVM_UNREFERENCED_PARAMETER(x) x
+
 #endif

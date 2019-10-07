@@ -22,7 +22,7 @@ else()
     add_library(${module_name} ${module_sources} ${module_public_headers} ${module_private_headers})
 endif()
 
-target_include_directories(${module_name} PRIVATE "${CMAKE_SOURCE_DIR}/${module_name}/include")
+target_include_directories(${module_name} PUBLIC "${CMAKE_SOURCE_DIR}/${module_name}/include")
 target_include_directories(${module_name} PRIVATE "${CMAKE_SOURCE_DIR}/${module_name}/src/h")
 
 #Group files in a IDE
@@ -58,6 +58,3 @@ if(module_tests)
     target_link_libraries(${module_name}_test PRIVATE GTest::GTest GTest::Main)
     add_test(AllTestsInMain ${module_name}_test)
 endif()
-
-
-

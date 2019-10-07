@@ -7,4 +7,5 @@ set(components
     eastl
     dcvm
     test
+    system
 )

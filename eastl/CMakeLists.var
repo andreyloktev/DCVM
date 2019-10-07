@@ -144,15 +144,15 @@ set(module_private_headers
 
 # Module sources
 set(module_sources
-    src/allocator_eastl.cpp
+#    src/allocator_eastl.cpp
     src/assert.cpp
     src/fixed_pool.cpp
     src/hashtable.cpp
     src/intrusive_list.cpp
-    src/numeric_limits.cpp
+#    src/numeric_limits.cpp
     src/red_black_tree.cpp
-    src/string.cpp
-    src/thread_support.cpp
+#    src/string.cpp
+#    src/thread_support.cpp
 )
 
 # Module defines

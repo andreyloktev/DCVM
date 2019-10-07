@@ -13,7 +13,7 @@ extern "C" {
  * @param pSrcFile source file name of the error.
  * @param line source file line of error
 */
-typedef void (*DCVMPrintError)(enum DCVMError err, const char *pSrcFile, unsigned long line);
+typedef void (*DCVMPrintError)(enum DCVM_ERROR err, const char *pSrcFile, unsigned long line);
 
 /*!
  * Pring debug information.

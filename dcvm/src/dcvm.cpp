@@ -1,40 +1,33 @@
-#include <dcvm.h>
+#include <dcvm/dcvm.h>
+#include "base/DCVMTypes.hpp"
 
-struct Dcvm final
+
+struct DCVM final
 {
 
 };
 
 extern "C"
 {
-    DCVMError dcvm_Init(struct DCVM **ppDcvm)
+    enum DCVM_ERROR dcvm_Init(struct DCVM **ppDcvm, struct DCVMContext *pCtxt)
     {
-        return DCVM_ERR_NOT_IMPLEMENTED;
+
     }
 
-    void dcvm_Release(struct DCVM *pDcvm)
-    {
-        if (pDcvm)
-        {
-            delete pDcvm;
-        }
-    }
+    void dcvm_Release(struct DCVM *pDcvm, struct DCVMContext *pCtxt);
 
-    DCVMError dcvm_ControlGetOauth2Url(struct DCVM *pDcvm, DCVMCloudDiskTypes type, DCVMChar_t **ppUrl)
-    {
-        return DCVM_ERR_NOT_IMPLEMENTED;
-    }
+    
+    void dcvm_ControlAddClient(struct DCVM *pDcvm, const DCVMCloudDiskAPI pClient, struct DCVMContext *pCtxt);
 
-    DCVMError dcvm_ControlLogIn(struct DCVM *pDcvm, DCVMCloudDiskTypes type, const DCVMChar_t *pCode)
-    {
-        return DCVM_ERR_NOT_IMPLEMENTED;
-    }
+    
+    void dcvm_ControlGetUnauthorizedClients(struct DCVM *pDcvm, DCVMClientOAuthUri **pClients, struct DCVMContext *pCtxt);
 
-    void dcvm_ReleaseString(struct DCVM *pDcvm, DCVMChar_t *pStr)
-    {
-        if (pStr)
-        {
-            delete[]pStr;
-        }
-    }
+    
+    enum DCVM_ERROR dcvm_ControlLogIn(struct DCVM *pDcvm, const DCVMClientOAuthCode *pCodes, struct DCVMCloudDisk **ppCloudDisk, struct DCVMContext *pCtxt);
+
+    
+    void dcvm_ControlLogOut(struct DCVM *pDcvm, struct DCVMCloudDisk *pCloudDisk, struct DCVMContext *pCtxt);
+
+    
+    void dcvm_ReleaseString(struct DCVM *pDcvm, dcvm_char_t *pStr);
 }

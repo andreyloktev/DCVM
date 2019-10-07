@@ -7,6 +7,8 @@
 //token_type: bearer
 const utility::string_t YANDEX_OATH_HOST    = U("https://oauth.yandex.ru");
 
+size_t;
+
 int main(int argv, const char **ppArgc)
 {
     web::http::status_code statusCode = 200;
