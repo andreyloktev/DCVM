@@ -3,20 +3,24 @@
 
 #include <dcvm/DCVMError.h>
 #include "../base/DCVMTypes.hpp"
+#include "../base/MemoryBase.hpp"
 #include <dcvm/DCVMCloudDiskAPI.h>
 
 namespace dcvm      {
 namespace clouddisk {
 
 struct DCVMHandle;
-class ICloudDisk;
 
-class CloudDiskFile final
+template <class SystemApi>
+struct ICloudDisk;
+
+template<class SystemApi>
+class CloudDiskFile final : public base::MemoryBase<SystemApi>
 {
     dcvm_uint32_t m_reffCnt = 0;
     DCVMHandle *m_pFileHandle = nullptr;
     DCVMFileInfo m_fileInfo = {};
-    ICloudDisk *m_pCloudDisk;
+    ICloudDisk<SystemApi> *m_pCloudDisk;
 private:
     CloudDiskFile(struct DCVMHandle *pFileHandle, const DCVMFileInfo &fi, ICloudDisk *pCloudDisk) noexcept;
     ~CloudDiskFile() noexcept;
@@ -24,12 +28,13 @@ private:
 public:
     void IncReff() noexcept;
     void DecReff() noexcept;
-    const DCVMFileInfo GetFileInfo() const noexcept;
+    const DCVMFileInfo& GetFileInfo() const noexcept;
 };
 
 /*!
  * @class ICloudDisk is interface which lets to work with one or several cloud disk.
 */
+template <class SystemApi>
 struct ICloudDisk
 {
     /*!
@@ -76,7 +81,7 @@ struct ICloudDisk
     virtual DCVM_ERROR CloudCreateFile(
         const base::DCVMString_t    &fileName
         , const DCVMFileInfo        &fi
-        , CloudDiskFile*            &pFile
+        , CloudDiskFile<SystemApi>* &pFile
         , struct DCVMContext        *pCtxt
     ) noexcept = 0;
 
@@ -89,7 +94,7 @@ struct ICloudDisk
     */
     virtual DCVM_ERROR CloudCreateDirectory(
         const base::DCVMString_t    &dirName
-        , CloudDiskFile*            &pDir
+        , CloudDiskFile<SystemApi>* &pDir
         , struct DCVMContext        *pCtxt
     ) noexcept = 0;
 
@@ -102,7 +107,7 @@ struct ICloudDisk
     */
     virtual DCVM_ERROR CloudOpenFile(
         const base::DCVMString_t    &fileName
-        , CloudDiskFile*            &pFile
+        , CloudDiskFile<SystemApi>* &pFile
         , struct DCVMContext        *pCtxt
     ) noexcept = 0;
 
@@ -113,8 +118,8 @@ struct ICloudDisk
      * @return Error code.
     */
     virtual DCVM_ERROR CloudCloseFile(
-        CloudDiskFile           *pFile
-        , struct DCVMContext    *pCtxt
+        CloudDiskFile<SystemApi>    *pFile
+        , struct DCVMContext        *pCtxt
     ) noexcept = 0;
 
     /*!
@@ -127,11 +132,11 @@ struct ICloudDisk
      * @return Error code.
     */
     virtual DCVM_ERROR CloudReadFile(
-        CloudDiskFile           *pFile
-        , const dcvm_uint64_t   offset
-        , dcvm_uint8_t          *pBuffer
-        , const dcvm_uint32_t   buffserSize
-        , struct DCVMContext    *pCtxt
+        CloudDiskFile<SystemApi>    *pFile
+        , const dcvm_uint64_t       offset
+        , dcvm_uint8_t              *pBuffer
+        , const dcvm_uint32_t       buffserSize
+        , struct DCVMContext        *pCtxt
     ) const noexcept = 0;
 
     /*!
@@ -144,11 +149,11 @@ struct ICloudDisk
      * @return Error code.
     */
     virtual DCVM_ERROR CloudWriteFile(
-        CloudDiskFile           *pFile
-        , const dcvm_uint64_t   offset
-        , const dcvm_uint8_t    *pBuffer
-        , const dcvm_uint32_t   buffserSize
-        , struct DCVMContext    *pCtxt
+        CloudDiskFile<SystemApi>    *pFile
+        , const dcvm_uint64_t       offset
+        , const dcvm_uint8_t        *pBuffer
+        , const dcvm_uint32_t       buffserSize
+        , struct DCVMContext        *pCtxt
     ) noexcept = 0;
 
     /*!
@@ -191,7 +196,7 @@ struct ICloudDisk
     */
     virtual DCVM_ERROR CloudMoveFile(
         const base::DCVMString_t    &srcFileName
-        , CloudDiskFile             *pFile
+        , CloudDiskFile<SystemApi>  *pFile
         , const base::DCVMString_t  &dstFileName
         , dcvm_bool_t               bReplace
         , struct DCVMContext        *pCtxt

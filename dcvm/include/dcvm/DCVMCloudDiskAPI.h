@@ -1,8 +1,9 @@
 #ifndef DCVM_DCVM_CLOUDDISKAPI_H_
 #define DCVM_DCVM_CLOUDDISKAPI_H_
 
-#include <dcvm/DCVMTypes.h>
-#include <dcvm/DCVMError.h>
+#include "DCVMTypes.h"
+#include "DCVMError.h"
+#include "dcvm_system.h"
 
 typedef struct OAuthToken
 {
@@ -52,34 +53,49 @@ typedef const dcvm_char_t (*DCVMCloudGetCloudDiskId)(struct DCVMContext *pCtxt);
 /*!
  * @brief Get OAuth url.
  * @param [out] ppUrl url.
+ * @param [in] pSystemApi set of System API function.
  * @param [in] pCtxt system context(optional).
  * @return Error code.
 */
-typedef enum DCVM_ERROR (*DCVMCloudGetOAuthUrl)(dcvm_char_t **ppUrl, struct DCVMContext *pCtxt);
+typedef enum DCVM_ERROR (*DCVMCloudGetOAuthUrl)(dcvm_char_t **ppUrl, DCVMSystemAPI *pSystemApi, struct DCVMContext *pCtxt);
 
 /*!
  * @brief Create an instance of DCVMCloudDisk(make log in operation by OAuth codes).
  * @param [in] pCode OAuth code.
  * @param [out] ppCloudDisk an instance of DCVMCloudDisk.
+ * @param [in] pSystemApi set of System API function.
  * @param [in] pCtxt system context(optional).
  * @return Error code.
 */ 
-typedef enum DCVM_ERROR (*DCVMCloudLogInWithOAuthCode)(const dcvm_char_t *pCode, struct DCVMCloudDisk **ppCloudDisk, struct DCVMContext *pCtxt);
+typedef enum DCVM_ERROR (*DCVMCloudLogInWithOAuthCode)(
+    const dcvm_char_t       *pCode
+    , struct DCVMCloudDisk  **ppCloudDisk
+    , DCVMSystemAPI         *pSystemApi
+    , struct DCVMContext    *pCtxt
+);
 
 /*!
  * @brief Create an instance of DCVMCloudDisk(make log in operation by OAuth refresh token).
  * @param [in] pRefreshToken OAuth refresh token.
  * @param [out] ppCloudDisk an instance of DCVMCloudDisk.
+ * @param [in] pSystemApi set of System API function.
  * @param [in] pCtxt system context(optional).
  * @return Error code.
 */ 
-typedef enum DCVM_ERROR (*DCVMCloudLogInWithRefreshToken)(const dcvm_char_t *pRefreshToken, struct DCVMCloudDisk *ppCloudDisk, struct DCVMContext *pCtxt);
+typedef enum DCVM_ERROR (*DCVMCloudLogInWithRefreshToken)(
+    const dcvm_char_t       *pRefreshToken
+    , struct DCVMCloudDisk  **ppCloudDisk
+    , DCVMSystemAPI         *pSystemApi
+    , struct DCVMContext    *pCtxt
+);
 
 /*!
  * @brief Get OAuthToken(access token, refresh token and token type)
+ * @param [in] pCloudDisk an instance of DCVMCloudDisk.
+ * @param [in] pCtxt system context(optional).
  * @return OAuthToken object
 */
-typedef OAuthToken (*DCVMGetOAuthToken)();
+typedef OAuthToken (*DCVMGetOAuthToken)(struct DCVMCloudDisk *pCloudDisk, struct DCVMContext *pCtxt);
 
 /*!
  * @brief Log out. Release a DCVMCloudDisk instance created after LogIn operation.
@@ -102,7 +118,7 @@ typedef enum DCVM_ERROR (*DCVMCloudCreateFile)(
     struct DCVMCloudDisk        *pCloudDisk
     , const dcvm_char_t         *pFileName
     , const DCVMFileInfo        *pFi
-    , struct DCVMFileInfo       *pFileInfo
+    , DCVMFileInfo              *pFileInfo
     , struct DCVMHandle         **ppFileHandle
     , struct DCVMContext        *pCtxt
 );
@@ -118,7 +134,7 @@ typedef enum DCVM_ERROR (*DCVMCloudCreateFile)(
 typedef enum DCVM_ERROR (*DCVMCloudOpenFile)(
     struct DCVMCloudDisk    *pCloudDisk
     , const dcvm_char_t     *pFileName
-    , struct DCVMFileInfo   *pFileInfo
+    , DCVMFileInfo          *pFileInfo
     , struct DCVMHandle     **ppFileHandle
     , struct DCVMContext    *pCtxt
 );
@@ -145,7 +161,7 @@ typedef enum DCVM_ERROR (*DCVMCloudCloseFile)(
 typedef enum DCVM_ERROR (*DCVMCloudGetFileInfo)(
     struct DCVMCloudDisk    *pCloudDisk
     , struct DCVMHandle     *pFileHandle
-    , struct DCVMFileInfo   *pFileInfo
+    , DCVMFileInfo          *pFileInfo
     , struct DCVMContext    *pCtxt
 );
 

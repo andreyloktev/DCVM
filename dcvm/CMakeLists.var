@@ -21,6 +21,9 @@ set(module_private_headers
     src/base/DCVMTypes.hpp
     src/base/EASTLAllocator.hpp
     src/base/SystemApi.hpp
+    src/base/NameValuePair.hpp
+    src/base/dcvm_defines.hpp
+    src/CloudDiskManager/CloudDiskManager.hpp
 )
 
 # Module sources

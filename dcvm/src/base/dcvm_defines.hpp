@@ -1,0 +1,8 @@
+#ifndef DCVM_BASE_DCVM_DEFINES_HPP_
+#define DCVM_BASE_DCVM_DEFINES_HPP_
+
+#ifndef UNREFFERENCE_VARIABLE
+#define UNREFFERENCE_VARIABLE(x) x
+#endif
+
+#endif

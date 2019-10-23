@@ -46,6 +46,14 @@ typedef void (*DCVMMemoryCopy)(void *pDst, dcvm_size_t dstSize,  const void *pSr
 typedef dcvm_int32_t (*DCVMMemoryCompare)(void *pBlock1, const void *pBlock2, dcvm_size_t bytesToCmp);
 
 /*!
+ * @brief Sets the first 'size' bytes of the block of memory pointed by pBlock to the specified value.
+ * @param [in] pBlock block of memory to initialize.
+ * @param [in] size memory block size.
+ * @param [in] value.
+*/
+typedef void (*DCVMMemorySet)(void *pBlock, dcvm_size_t size, dcvm_uint8_t value);
+
+/*!
  * @brief Send http request and get response.
  * @param [in] pMethod http request method.
  * @param [in] pUri operation
@@ -79,6 +87,7 @@ typedef struct _DCVMSystemAPI
 {
     DCVMMemoryAlloc     MemoryAllocate;
     DCVMMemoryFree      MemoryFree;
+    DCVMMemorySet       MemorySet;
     DCVMMemoryCopy      MemoryCopy;
     DCVMMemoryCompare   MemoryCompare;
     DCVMSendHttpRequest SendHttpRequest;

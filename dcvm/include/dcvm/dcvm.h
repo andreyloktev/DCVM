@@ -4,6 +4,7 @@
 #include "DCVMTypes.h"
 #include "DCVMError.h"
 #include "DCVMLogger.h"
+#include "dcvm_system.h"
 #include "DCVMCloudDiskAPI.h"
 
 /*!
@@ -37,7 +38,7 @@ extern "C" {
  * @param [in] pCtxt system context(optional).
  * @return error code.
 */
-enum DCVM_ERROR dcvm_Init(struct DCVM **ppDcvm, struct DCVMContext *pCtxt);
+enum DCVM_ERROR dcvm_Init(DCVMSystemAPI *pSystemApi, struct DCVM **ppDcvm, struct DCVMContext *pCtxt);
 
 /*!
  * Release DCVM object.
