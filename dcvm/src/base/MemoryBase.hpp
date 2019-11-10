@@ -1,16 +1,18 @@
 #ifndef DCVM_BASE_MEMORYBASE_HPP_
 #define DCVM_BASE_MEMORYBASE_HPP_
 
+#include "SystemApi.hpp"
+
 namespace dcvm {
 namespace base {
 
-template <typename SystemApi>
+
 struct MemoryBase
 {
     MemoryBase() noexcept = default;
     ~MemoryBase() noexcept = default;
-    MemoryBase(const MemBased&) noexcept = default;
-    MemoryBase& operator=(const MemBased&) noexcept = default;
+    MemoryBase(const MemoryBase&) noexcept = default;
+    MemoryBase& operator=(const MemoryBase&) noexcept = default;
 
     static void* operator new(dcvm_size_t size) noexcept
     {

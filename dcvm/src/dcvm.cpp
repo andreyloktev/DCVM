@@ -3,6 +3,7 @@
 #include "base/DCVMTypes.hpp"
 #include "base/MemoryBase.hpp"
 #include "base/SystemApi.hpp"
+#include "CloudDiskManager/CloudDiskManager.hpp"
 
 namespace dcvm {
 
@@ -10,7 +11,7 @@ DCVMSystemAPI *g_pSystemApi = nullptr;
 
 } //namespace dcvm
 
-struct DCVM final : public dcvm::base::MemoryBase<dcvm::base::SystemApi>
+struct DCVM final : public dcvm::base::MemoryBase
 {
 };
 

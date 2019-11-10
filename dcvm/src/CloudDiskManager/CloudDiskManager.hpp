@@ -14,13 +14,8 @@ namespace clouddiskmanager  {
  * @class CloudDiskManager.
  * @brief CloudDiskManager is responsible for managing cloud disk clients.
 */
-template <class SystemApi>
-class CloudDiskManager final : public base::MemoryBase<SystemApi>
+class CloudDiskManager final : public base::MemoryBase
 {
-    using ICloudDisk_t = clouddisk::ICloudDisk<SystemApi>;
-    using DCVMCloudDisksPool = base::DCVMUnorderedMap_t<base::DCVMString_t, ICloudDisk_t>;
-private:
-    DCVMCloudDisksPool m_cloudDisdk;
 public:
     CloudDiskManager() noexcept;
     ~CloudDiskManager() noexcept;
@@ -28,14 +23,16 @@ public:
     CloudDiskManager& operator=(const CloudDiskManager&) = delete;
 public:
     /*!
-     * Add a client.
+     * @brief Add a client.
      * @param [in] client cloud disk clent.
+     * @param [int, out] clientId client id.
      * @param [in] pCtxt system context(optional).
+     * @return error code.
     */
-    void AddClient(DCVMCloudDiskAPI client, struct DCVMContext *pCtxt) noexcept;
+    DCVM_ERROR AddClient(DCVMCloudDiskAPI client, base::DCVMString_t &clientId, struct DCVMContext *pCtxt) noexcept;
 
     /*!
-     * Get all clients.
+     * Get all authorized clients.
      * @param [in] pCtxt system context(optional).
      * @return list of all clients.
     */
@@ -43,11 +40,13 @@ public:
 
     /*!
      * Get all unauthorized clients.
+     * @param [out] clients array <client id, OAuth url> of all unauthorized clients.
      * @param [in] pCtxt system context(optional).
-     * @return list <client id, OAuth url> of all unauthorized clients.
+     * @return error code.
     */
-    base::DCVMVector_t<base::DCVMPair_t<base::DCVMString_t, base::DCVMString_t>> GetUnauthorizedClients(
-        struct DCVMContext *pCtxt
+    DCVM_ERROR GetUnauthorizedClients(
+        base::DCVMVector_t<base::DCVMPair_t<base::DCVMString_t, base::DCVMString_t>>    &clients
+        , struct DCVMContext                                                            *pCtxt
     ) const noexcept;
 
     /*!
@@ -70,7 +69,7 @@ public:
      * @param [in] pCtxt system context(optional).
      * @return error code.
     */
-   DCVM_ERROR CreateCloudDisk(
+   DCVM_ERROR InitCloudDisk(
        const base::DCVMString_t &clientId
        , clouddisk::ICloudDisk* &pCloudDisk
        , struct DCVMContext     *pCtxt
@@ -84,16 +83,21 @@ public:
      * @param [in] pCtxt system context(optional).
      * @return error code.
     */
-   DCVM_ERROR CreateCloudDisk(
+   DCVM_ERROR InitCloudDisk(
        const base::DCVMVector_t<base::DCVMString_t> &clientIds
        , clouddisk::ICloudDisk*                     &pCloudDisk
        , struct DCVMContext                         *pCtxt
    ) const noexcept;
+
+private:
+    using ICloudDisk_t = clouddisk::ICloudDisk;
+    using DCVMCloudDisksPool = base::DCVMMap_t<base::DCVMString_t, ICloudDisk_t*>;
+private:
+    DCVMCloudDisksPool m_clients; /// All unauthorized clients.
+    DCVMCloudDisksPool m_authorzedClients; /// All authorized clients.
 };
 
 } // namespace clouddiskmanager
 } // namespace dcvm
 
 #endif
-
-#include "CloudDiskManager_impl.hpp"

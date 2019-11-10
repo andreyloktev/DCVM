@@ -2,7 +2,7 @@
 #define DCVM_BASE_SYSTEMAPI_HPP_
 
 #include <dcvm/dcvm_system.h>
-#include "DCVMTypes.hpp"
+#include <dcvm/DCVMTypes.h>
 
 namespace dcvm {
 

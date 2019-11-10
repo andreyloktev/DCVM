@@ -5,18 +5,18 @@
 #include "DCVMError.h"
 #include "dcvm_system.h"
 
-typedef struct OAuthToken
+typedef struct _OAuthToken
 {
     const dcvm_char_t *pAccessToken;
     const dcvm_char_t *pRefreshToken;
     const dcvm_char_t *pTokenType;
-};
+} OAuthToken;
 
 enum DCVMFileType
 {
-    File
-    , Dirctory
-    , SymbolicLink
+    DCVM_File
+    , DCVM_Dirctory
+    , DCVM_SymbolicLink
 };
 
 #define FILE_NAME_SIZE 256
@@ -48,7 +48,7 @@ extern "C" {
  * @warning It's must have to implement function.
  * @return unique client identification.
 */
-typedef const dcvm_char_t (*DCVMCloudGetCloudDiskId)(struct DCVMContext *pCtxt);
+typedef const dcvm_char_t* (*DCVMCloudGetCloudDiskId)(struct DCVMContext *pCtxt);
 
 /*!
  * @brief Get OAuth url.
@@ -265,7 +265,8 @@ typedef enum DCVM_ERROR (*DCVMCloudGetDiskInfo)(
 
 typedef struct _DCVMCloudDiskAPI
 {
-    DCVMCloudGetOAuthUrl            GetOAuthUrl;
+    DCVMCloudGetCloudDiskId         GetCloudDiskId;
+    DCVMCloudGetOAuthUrl            GetOAuthUri;
     DCVMCloudLogInWithOAuthCode     LogInWithOAuthCode;
     DCVMCloudLogInWithRefreshToken  LogInWithRefreshToken;
     DCVMCloudLogOut                 LogOut;

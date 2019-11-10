@@ -2,7 +2,6 @@
 #define DCVM_BASE_EASTLALLOCATOR_HPP_
 
 #include "SystemApi.hpp"
-#include <dcvm/DCVMTypes.h>
 
 namespace dcvm {
 namespace base {
@@ -111,10 +110,7 @@ public:
     }
 };
 
-} // namespace base
-} // namespace dcvm
-
-bool operator==(
+inline bool operator==(
     const dcvm::base::EASTLAllocator     &a
     , const dcvm::base::EASTLAllocator   &b
 ) noexcept
@@ -122,12 +118,15 @@ bool operator==(
     return &a == &b;
 }
 
-bool operator!=(
+inline bool operator!=(
     const dcvm::base::EASTLAllocator     &a
     , const dcvm::base::EASTLAllocator   &b
 ) noexcept
 {
     return &a != &b;
 }
+
+} // namespace base
+} // namespace dcvm
 
 #endif

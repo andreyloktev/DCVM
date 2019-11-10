@@ -4,39 +4,35 @@
 #include <dcvm/DCVMError.h>
 #include "../base/DCVMTypes.hpp"
 #include "../base/MemoryBase.hpp"
+#include "../base/ICloudDiskUnknown.hpp"
 #include <dcvm/DCVMCloudDiskAPI.h>
+#include "objects/CloudDiskDirectory.hpp"
+#include "objects/CloudDiskFile.hpp"
 
 namespace dcvm      {
 namespace clouddisk {
 
-struct DCVMHandle;
-
-template <class SystemApi>
-struct ICloudDisk;
-
-template<class SystemApi>
-class CloudDiskFile final : public base::MemoryBase<SystemApi>
-{
-    dcvm_uint32_t m_reffCnt = 0;
-    DCVMHandle *m_pFileHandle = nullptr;
-    DCVMFileInfo m_fileInfo = {};
-    ICloudDisk<SystemApi> *m_pCloudDisk;
-private:
-    CloudDiskFile(struct DCVMHandle *pFileHandle, const DCVMFileInfo &fi, ICloudDisk *pCloudDisk) noexcept;
-    ~CloudDiskFile() noexcept;
-    DCVMHandle* GetFileHandle() noexcept;
-public:
-    void IncReff() noexcept;
-    void DecReff() noexcept;
-    const DCVMFileInfo& GetFileInfo() const noexcept;
-};
-
 /*!
  * @class ICloudDisk is interface which lets to work with one or several cloud disk.
 */
-template <class SystemApi>
-struct ICloudDisk
+class ICloudDisk : public base::ICloudDiskUnknown
 {
+public:
+    /*!
+     * @brief Get cloud disk unique identifier.
+     * @param [in] pCtxt system context(optional).
+     * @return cloud disk identifier.
+    */
+   virtual base::DCVMString_t GetCloudDiskId(struct DCVMContext *pCtxt) const noexcept = 0;
+
+   /*!
+    * @brief Get uri to get OAuth code.
+    * @param [out] uri
+    * @param [in] pCtxt system context(optional).
+    * @return error code.
+   */
+   virtual DCVM_ERROR GetOAuthUri(base::DCVMString_t &uri, struct DCVMContext *pCtxt) const noexcept = 0;
+
     /*!
      * @brief Initialize CloudDisk using OAuth code.
      * @param [in] code OAuth code.
@@ -71,6 +67,37 @@ struct ICloudDisk
     virtual DCVM_ERROR LogOut(struct DCVMContext *pCtxt) noexcept = 0;
 
     /*!
+     * @brief Mount cloud disk(Initialize)
+     * @param [in] flags mount flags.
+     * @param [out] pRootDir root directory.
+     * @param [in] pCtxt system context(optional).
+     * @return Error code.
+    */
+   virtual DCVM_ERROR Mount(
+       const dcvm_uint64_t              flags
+       , objects::CloudDiskDirectory*   &pRootDir
+       , struct DCVMContext             *pCtxt
+   ) noexcept = 0;
+
+    /*!
+     * @brief Unmount cloud disk(Flush all cached info, release all internal allocated structures).
+     * @param [in] pCtxt system context(optional).
+     * @return Error code.
+    */
+   virtual DCVM_ERROR Unmount(struct DCVMContext *pCtxt) noexcept = 0;
+
+    /*!
+     * Get information about a cloud disk.
+     * @param [in] di disk information.
+     * @param [in] pCtxt system context(optional).
+     * @return Error code.
+    */
+    virtual DCVM_ERROR CloudGetDiskInfo(
+        DCVMCloudDiskInfo       &di
+        , struct DCVMContext    *pCtxt
+    ) const noexcept = 0;
+protected:
+    /*!
      * @brief Create a file.
      * @param [in] fileName full specified file name (file path + file name).
      * @param [in] fi additional file information used to create a file(file flags)
@@ -81,7 +108,7 @@ struct ICloudDisk
     virtual DCVM_ERROR CloudCreateFile(
         const base::DCVMString_t    &fileName
         , const DCVMFileInfo        &fi
-        , CloudDiskFile<SystemApi>* &pFile
+        , objects::CloudDiskFile*   &pFile
         , struct DCVMContext        *pCtxt
     ) noexcept = 0;
 
@@ -94,7 +121,7 @@ struct ICloudDisk
     */
     virtual DCVM_ERROR CloudCreateDirectory(
         const base::DCVMString_t    &dirName
-        , CloudDiskFile<SystemApi>* &pDir
+        , objects::CloudDiskFile*   &pDir
         , struct DCVMContext        *pCtxt
     ) noexcept = 0;
 
@@ -107,7 +134,7 @@ struct ICloudDisk
     */
     virtual DCVM_ERROR CloudOpenFile(
         const base::DCVMString_t    &fileName
-        , CloudDiskFile<SystemApi>* &pFile
+        , objects::CloudDiskFile*   &pFile
         , struct DCVMContext        *pCtxt
     ) noexcept = 0;
 
@@ -118,8 +145,8 @@ struct ICloudDisk
      * @return Error code.
     */
     virtual DCVM_ERROR CloudCloseFile(
-        CloudDiskFile<SystemApi>    *pFile
-        , struct DCVMContext        *pCtxt
+        objects::CloudDiskFile  *pFile
+        , struct DCVMContext    *pCtxt
     ) noexcept = 0;
 
     /*!
@@ -132,11 +159,11 @@ struct ICloudDisk
      * @return Error code.
     */
     virtual DCVM_ERROR CloudReadFile(
-        CloudDiskFile<SystemApi>    *pFile
-        , const dcvm_uint64_t       offset
-        , dcvm_uint8_t              *pBuffer
-        , const dcvm_uint32_t       buffserSize
-        , struct DCVMContext        *pCtxt
+        objects::CloudDiskFile  *pFile
+        , const dcvm_uint64_t   offset
+        , dcvm_uint8_t          *pBuffer
+        , const dcvm_uint32_t   buffserSize
+        , struct DCVMContext    *pCtxt
     ) const noexcept = 0;
 
     /*!
@@ -149,11 +176,11 @@ struct ICloudDisk
      * @return Error code.
     */
     virtual DCVM_ERROR CloudWriteFile(
-        CloudDiskFile<SystemApi>    *pFile
-        , const dcvm_uint64_t       offset
-        , const dcvm_uint8_t        *pBuffer
-        , const dcvm_uint32_t       buffserSize
-        , struct DCVMContext        *pCtxt
+        objects::CloudDiskFile  *pFile
+        , const dcvm_uint64_t   offset
+        , const dcvm_uint8_t    *pBuffer
+        , const dcvm_uint32_t   buffserSize
+        , struct DCVMContext    *pCtxt
     ) noexcept = 0;
 
     /*!
@@ -187,6 +214,7 @@ struct ICloudDisk
 
     /*!
      * Move a file.
+     * @param [in] pSrcDir source directory.
      * @param [in] srcFileName source full file name.
      * @param [in] pFile source file handle if file was openned before(optional).
      * @param [in] dstFileName destibation full file name.
@@ -195,23 +223,14 @@ struct ICloudDisk
      * @return Error code.
     */
     virtual DCVM_ERROR CloudMoveFile(
-        const base::DCVMString_t    &srcFileName
-        , CloudDiskFile<SystemApi>  *pFile
-        , const base::DCVMString_t  &dstFileName
-        , dcvm_bool_t               bReplace
-        , struct DCVMContext        *pCtxt
+        objects::CloudDiskDirectory     *pSrcDir
+        , const base::DCVMString_t      &srcFileName
+        , objects::CloudDiskFile        *pFile
+        , const base::DCVMString_t      &dstFileName
+        , objects::CloudDiskDirectory   *pDstDir
+        , dcvm_bool_t                   bReplace
+        , struct DCVMContext            *pCtxt
     ) noexcept = 0;
-
-    /*!
-     * Get information about a cloud disk.
-     * @param [in] di disk information.
-     * @param [in] pCtxt system context(optional).
-     * @return Error code.
-    */
-    virtual DCVM_ERROR CloudGetDiskInfo(
-        DCVMCloudDiskInfo       &di
-        , struct DCVMContext    *pCtxt
-    ) const noexcept = 0;
 };
 
 } // namespace clouddisk

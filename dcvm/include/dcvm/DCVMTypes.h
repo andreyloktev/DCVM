@@ -3,8 +3,10 @@
 
 #ifdef _WIN32
 typedef wchar_t dcvm_char_t;
+#define DCVM_TEXT(text) L#text
 #else
-typedef char dcvm_char_t; 
+typedef char dcvm_char_t;
+#define DCVM_TEXT(text) #text
 #endif
 
 #define DCVM_TRUE   1
@@ -23,12 +25,17 @@ typedef int                 dcvm_int32_t;
 typedef long long           dcvm_int64_t;
 
 #ifdef _WIN32
-#ifdef _WIN64
-typedef unsigned long long dcvm_size_t;
+    #ifdef _WIN64
+    typedef unsigned long long dcvm_size_t;
+    #else
+    typedef unsigned int dcvm_size_t;
+    #endif
 #else
-typedef unsigned int dcvm_size_t;
-#endif
-#else
+    #ifdef __x86_64__
+    typedef unsigned long long dcvm_size_t;
+    #else
+    typedef unsigned int dcvm_size_t;
+    #endif
 #endif
 
 #define DCVM_UNREFERENCED_PARAMETER(x) x

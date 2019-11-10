@@ -17,18 +17,29 @@ set(module_public_headers
 
 # Private module headers
 set(module_private_headers
-    src/CloudDisk/ICloudDisk.hpp
+    src/base/dcvm_defines.hpp
     src/base/DCVMTypes.hpp
     src/base/EASTLAllocator.hpp
-    src/base/SystemApi.hpp
+    src/base/ICloudDiskUnknown.hpp
+    src/base/MemoryBase.hpp
     src/base/NameValuePair.hpp
-    src/base/dcvm_defines.hpp
-    src/CloudDiskManager/CloudDiskManager.hpp
+    src/base/SystemApi.hpp
+    src/clouddisk/objects/CloudDiskDirectory.hpp
+    src/clouddisk/objects/CloudDiskFile.hpp
+    src/clouddisk/objects/CloudDiskObject.hpp
+    src/clouddisk/CloudDisk.hpp
+    src/clouddisk/ICloudDisk.hpp
+    src/clouddiskmanager/CloudDiskManager.hpp
 )
 
 # Module sources
 set(module_sources
     src/dcvm.cpp
+    src/clouddisk/objects/CloudDiskDirectory.cpp
+    src/clouddisk/objects/CloudDiskFile.cpp
+    src/clouddisk/objects/CloudDiskObject.cpp
+    src/clouddisk/CloudDisk.cpp
+    src/clouddiskmanager/CloudDiskManager.cpp
 )
 
 # Module defines
