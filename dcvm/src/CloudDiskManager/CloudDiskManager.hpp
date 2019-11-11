@@ -65,26 +65,33 @@ public:
     /*!
      * Create a cloud disk instance.
      * @param [in] clientId client id.
+     * @param [in] flags initialization flags.
+     * @param [out] pRootDir pointer to root directory.
      * @param [out] pCloudDisk cloud disk instance
      * @param [in] pCtxt system context(optional).
      * @return error code.
     */
    DCVM_ERROR InitCloudDisk(
-       const base::DCVMString_t &clientId
-       , clouddisk::ICloudDisk* &pCloudDisk
-       , struct DCVMContext     *pCtxt
+       const base::DCVMString_t                     &clientId
+       , const dcvm_uint64_t                        flags
+       , clouddisk::objects::CloudDiskDirectory*    &pRootDir
+       , clouddisk::ICloudDisk*                     &pCloudDisk
+       , struct DCVMContext                         *pCtxt
    ) const noexcept;
 
    /*!
      * Create a cloud disk instance.
      * Created a cloud disk instance works with several DCVMCloudDiskAPI clients -- represent all clients in one.
      * @param [in] clientIds list of client ids.
+     * @param [out] pRootDir pointer to root directory.
      * @param [out] pCloudDisk cloud disk instance.
      * @param [in] pCtxt system context(optional).
      * @return error code.
     */
    DCVM_ERROR InitCloudDisk(
        const base::DCVMVector_t<base::DCVMString_t> &clientIds
+       , const dcvm_uint64_t                        flags
+       , clouddisk::objects::CloudDiskDirectory*    &pRootDir
        , clouddisk::ICloudDisk*                     &pCloudDisk
        , struct DCVMContext                         *pCtxt
    ) const noexcept;
