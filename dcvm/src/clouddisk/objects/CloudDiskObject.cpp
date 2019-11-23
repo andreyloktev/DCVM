@@ -14,9 +14,17 @@ dcvm_int32_t CloudDiskObject::IncReff() noexcept
     return ++m_reffCnt;
 }
 
-dcvm_int32_t CloudDiskObject::DecReff() noexcept
+dcvm_int32_t CloudDiskObject::DecReff(struct DCVMContext *pCtxt) noexcept
 {
-    return --m_reffCnt;
+    auto value = --m_reffCnt;
+
+    if (0 == value)
+    {
+        Flush(pCtxt);
+        delete this;
+    }
+
+    return value;
 }
 
 DCVMFileType CloudDiskObject::GetType() const noexcept

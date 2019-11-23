@@ -18,9 +18,17 @@ CloudDisk::~CloudDisk() noexcept
      return ++m_reffCnt;
  }
 
-dcvm_int32_t CloudDisk::DecReff() noexcept
+dcvm_int32_t CloudDisk::DecReff(struct DCVMContext *pCtxt) noexcept
 {
-    return --m_reffCnt;
+    auto value = --m_reffCnt;
+
+    if (0 == value)
+    {
+        Flush(pCtxt);
+        delete this;
+    }
+
+    return value;
 }
 
 base::DCVMString_t CloudDisk::GetCloudDiskId(struct DCVMContext *pCtxt) const noexcept 
@@ -86,6 +94,11 @@ DCVM_ERROR CloudDisk::CloudGetDiskInfo(
     DCVMCloudDiskInfo       &di
     , struct DCVMContext    *pCtxt
 ) const noexcept
+{
+    return DCVM_ERR_NOT_IMPLEMENTED;
+}
+
+DCVM_ERROR CloudDisk::Flush(struct DCVMContext *pCtxt) const noexcept
 {
     return DCVM_ERR_NOT_IMPLEMENTED;
 }

@@ -21,7 +21,7 @@ class CloudDiskObject : public base::MemoryBase, public base::ICloudDiskUnknown
 public:
     dcvm_int32_t IncReff() noexcept override final;
 
-    dcvm_int32_t DecReff() noexcept override final;
+    dcvm_int32_t DecReff(struct DCVMContext *pCtxt) noexcept override final;
 
     /*!
      * @brief Constructor.

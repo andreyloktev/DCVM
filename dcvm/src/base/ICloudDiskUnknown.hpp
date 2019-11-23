@@ -16,9 +16,10 @@ struct ICloudDiskUnknown
 
     /*!
      * @brief Decrement refference counter.
+     * @param [in] pCtxt system context(optional).
      * @return refference counter value.
     */
-    virtual dcvm_int32_t DecReff() noexcept = 0;
+    virtual dcvm_int32_t DecReff(struct DCVMContext *pCtxt) noexcept = 0;
 };
 
 } // namespace base

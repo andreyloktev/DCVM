@@ -20,7 +20,7 @@ public:
 
     dcvm_int32_t IncReff() noexcept override;
 
-    dcvm_int32_t DecReff() noexcept override;
+    dcvm_int32_t DecReff(struct DCVMContext *pCtxt) noexcept override;
 
     base::DCVMString_t GetCloudDiskId(struct DCVMContext *pCtxt) const noexcept override;
 
@@ -52,6 +52,8 @@ public:
         DCVMCloudDiskInfo       &di
         , struct DCVMContext    *pCtxt
     ) const noexcept override;
+
+    DCVM_ERROR Flush(struct DCVMContext *pCtxt) const noexcept override;
 protected:
     DCVM_ERROR CloudCreateFile(
         const base::DCVMString_t    &fileName

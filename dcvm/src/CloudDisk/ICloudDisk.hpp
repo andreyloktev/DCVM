@@ -96,6 +96,13 @@ public:
         DCVMCloudDiskInfo       &di
         , struct DCVMContext    *pCtxt
     ) const noexcept = 0;
+
+    /*!
+     * Flush all cached information into a cloud disk.
+     * @param [in] pCtxt system context(optional).
+     * @return error code.
+    */
+    virtual DCVM_ERROR Flush(struct DCVMContext *pCtxt) const noexcept = 0;
 protected:
     /*!
      * @brief Create a file.
