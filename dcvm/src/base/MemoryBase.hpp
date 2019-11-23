@@ -16,13 +16,7 @@ struct MemoryBase
 
     static void* operator new(dcvm_size_t size) noexcept
     {
-        void *p = SystemApi::MemoryAllocate(static_cast<unsigned long>(size));
-        if (p)
-        {
-            SystemApi::MemorySet(p, size, 0);
-        }
-
-        return p;
+        return SystemApi::MemoryAllocate(static_cast<unsigned long>(size), DCVM_TRUE);
     }
 
     static void operator delete(void *pBuffer) noexcept
@@ -35,13 +29,7 @@ struct MemoryBase
 
     static void* operator new[](dcvm_size_t size) noexcept
     {
-        void *p = SystemApi::MemoryAllocate(static_cast<unsigned long>(size));
-        if (p)
-        {
-            SystemApi::MemorySet(p, size, 0);
-        }
-
-        return p;
+        return SystemApi::MemoryAllocate(static_cast<unsigned long>(size), DCVM_TRUE);
     }
 
     static void operator delete[](void *pBuffer) noexcept

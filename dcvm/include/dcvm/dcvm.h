@@ -4,28 +4,27 @@
 #include "DCVMTypes.h"
 #include "DCVMError.h"
 #include "DCVMLogger.h"
-#include "dcvm_system.h"
 #include "DCVMCloudDiskAPI.h"
 
 /*!
  * @class DCVMClientOAuthUrl.
  * It's pair of client unique identifier and uri to get OAuth code.
 */
-struct DCVMClientOAuthUri
+typedef struct _DCVMClientOAuthUri
 {
-    const dcvm_char_t *pClientId;
-    const dcvm_char_t *pUri;
-};
+    dcvm_char_t *pClientId;
+    dcvm_char_t *pUri;
+} DCVMClientOAuthUri;
 
 /*!
  * @class DCVMClientOAuthCode.
  * It's pair of client unique identifier and OAuth code to get access and refresh tokens.
 */
-struct DCVMClientOAuthCode
+typedef struct _DCVMClientOAuthCode
 {
     const dcvm_char_t *pClientId;
     const dcvm_char_t *pOAuthCode;
-};
+} DCVMClientOAuthCode;
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,7 +37,7 @@ extern "C" {
  * @param [in] pCtxt system context(optional).
  * @return error code.
 */
-enum DCVM_ERROR dcvm_Init(DCVMSystemAPI *pSystemApi, struct DCVM **ppDcvm, struct DCVMContext *pCtxt);
+enum DCVM_ERROR dcvm_Init(DCVMSystemAPI systemApi, struct DCVM **ppDcvm, struct DCVMContext *pCtxt);
 
 /*!
  * Release DCVM object.
@@ -50,44 +49,42 @@ void dcvm_Release(struct DCVM *pDcvm, struct DCVMContext *pCtxt);
 /*!
  * Add cloud disk client.
  * @param [in] pDcvm DCVM object.
- * @param [in] pClient client.
+ * @param [in] client cloud disk client.
+ * @param [out] ppClientId added client id.
  * @param [in] pCtxt system context(optional).
+ * @return error code.
 */
-void dcvm_ControlAddClient(struct DCVM *pDcvm, const DCVMCloudDiskAPI pClient, struct DCVMContext *pCtxt);
+enum DCVM_ERROR dcvm_ControlAddClient(struct DCVM *pDcvm, const DCVMCloudDiskAPI client, dcvm_char_t **ppClientId, struct DCVMContext *pCtxt);
+
+/*!
+ * Get list of authorized clients.
+ * @warning If result is success then after using ppClients have to be released by dcvm_ReleaseString.
+ * @param [in] pDcvm DCVM object.
+ * @param [out] pClients list of unauthorized clents. Buffer consist of null-terminated C strings.
+ * @param [out] pAmountClients amount clients
+ * @param [in] pCtxt system context(optional).
+ * @return amount of authorized clients
+*/
+enum DCVM_ERROR dcvm_ControlGetClients(struct DCVM *pDcvm, dcvm_char_t **ppClients, dcvm_size_t *pAmountClients, struct DCVMContext *pCtxt);
 
 /*!
  * Get list of unauthorized clients.
+ * @warning If result is success, then after using ppClients have to be release by dcvm_ReleaseDCVMClientOAuthUriArray.
  * @param [in] pDcvm DCVM object.
- * @param [out] pClients list of unauthorized clents. Mark of last elment is nullptr.
+ * @param [out] pClients list of unauthorized clents. Buffer consist of null-terminated C strings.
+ * @param [out] pAmountClients amount clients
  * @param [in] pCtxt system context(optional).
+ * @return amount of authorized clients
 */
-void dcvm_ControlGetUnauthorizedClients(struct DCVM *pDcvm, DCVMClientOAuthUri **pClients, struct DCVMContext *pCtxt);
-
-/*!
- * LogIn. Crate a cloud disk.
- * @warning created cloud disk control block must be freed via dcvm_ControlLogOut.
- * @param [in] pDcvm DCVM object.
- * @param [in] pCodes List of OAuth codes. Mark of end of the list is nullptr. If the input list contains several OAuth code for differnet clients, then a cloud disk control block under these clients will be created.
- * @param [out] ppCloudDisk cloud disk control block.
- * @param [in] pCtxt system context(optional).
- * @retunr error code.
-*/
-enum DCVM_ERROR dcvm_ControlLogIn(struct DCVM *pDcvm, const DCVMClientOAuthCode *pCodes, struct DCVMCloudDisk **ppCloudDisk, struct DCVMContext *pCtxt);
-
-/*!
- * LogOut. Release cloud disk control block.
- * @param [in] pDcvm DCVM object.
- * @param [in] ppCloudDisk cloud disk control block to release.
- * @param [in] pCtxt system context(optional).
-*/
-void dcvm_ControlLogOut(struct DCVM *pDcvm, struct DCVMCloudDisk *pCloudDisk, struct DCVMContext *pCtxt);
+enum DCVM_ERROR dcvm_ControlGetUnauthorizedClients(struct DCVM *pDcvm, DCVMClientOAuthUri **ppClients, dcvm_size_t *pAmountClients, struct DCVMContext *pCtxt);
 
 /*!
  * Release a string.
  * @param [in] pDcvm DCVM object.
- * @param [in] pStr string to release.
 */
-void dcvm_ReleaseString(struct DCVM *pDcvm, dcvm_char_t *pStr);
+void dcvm_ReleaseString(dcvm_char_t *pStr);
+
+void dcvm_ReleaseDCVMClientOAuthUriArray(DCVMClientOAuthUri *pClients, const dcvm_size_t size) noexcept;
 
 #ifdef __cplusplus
 };

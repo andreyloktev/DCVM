@@ -40,7 +40,7 @@ DCVM_ERROR CloudDisk::GetOAuthUri(base::DCVMString_t &uri, struct DCVMContext *p
 {
     dcvm_char_t *pUri = nullptr;
 
-    DCVM_ERROR err = m_cloudApi.GetOAuthUri(&pUri, g_pSystemApi, pCtxt);
+    DCVM_ERROR err = m_cloudApi.GetOAuthUri(&pUri, &g_systemApi, pCtxt);
     if (DCVM_FAILED(err))
     {
         DCVM_ERROR_TRACE(err);

@@ -17,9 +17,10 @@ extern "C" {
 /*!
  * @brief Allocate a blok of memory.
  * @param [in] size size of memory to allocate.
+ * @param [in] bZero does it zero the allocated memory.
  * @return pointer to an allocated block memory.
 */
-typedef void* (*DCVMMemoryAlloc)(dcvm_size_t size);
+typedef void* (*DCVMMemoryAlloc)(dcvm_size_t size, dcvm_bool_t bZero);
 
 /*!
  * Free previously allocated memory.

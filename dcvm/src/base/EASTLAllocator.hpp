@@ -45,7 +45,7 @@ public:
             return nullptr;
         }
 
-        void *pMem = SystemApi::MemoryAllocate(size + sizeof(void*));
+        void *pMem = SystemApi::MemoryAllocate(size + sizeof(void*), DCVM_TRUE);
         if (nullptr == pMem)
         {
             return nullptr;
@@ -72,7 +72,7 @@ public:
             return (value + (alignment - 1)) & (~(alignment - 1));
         };
 
-        void *pMem = SystemApi::MemoryAllocate(size + sizeof(void*) + (alignment - 1));
+        void *pMem = SystemApi::MemoryAllocate(size + sizeof(void*) + (alignment - 1), DCVM_TRUE);
         if (nullptr == pMem)
         {
             return nullptr;
