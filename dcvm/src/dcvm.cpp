@@ -37,10 +37,24 @@ dcvm_char_t* CopyDCVMString(const base::DCVMString_t &str) noexcept
 
 } //namespace dcvm
 
+/*!
+ * @class DCVM is control block of Dynamic cloud volume manager library.
+*/
 struct DCVM final : public dcvm::base::MemoryBase
 {
     dcvm::CloudDiskManager_t cloudDiskManager;
 };
+
+/*!
+ * @class DCVMCloudDisk represents initialized cloud disk instance.
+*/
+struct DCVMCloudDisk final : public dcvm::base::MemoryBase
+{
+    dcvm::clouddisk::ICloudDisk                     *pCloudDisk = nullptr;
+    dcvm::clouddisk::objects::CloudDiskDirectory    *pRootDir   = nullptr;
+};
+
+
 
 extern "C"
 {
@@ -201,6 +215,147 @@ extern "C"
             ppClients[i]->pClientId = dcvm::CopyDCVMString(clients[i].first);
             ppClients[i]->pUri = dcvm::CopyDCVMString(clients[i].second);
         }
+
+        return DCVM_ERR_SUCCESS;
+    }
+
+    DCVM_ERROR dcvm_ControlAuthorizeClient(DCVM *pDcvm, const DCVMClientOAuthCode *pOAuthCode, struct DCVMContext *pCtxt)
+    {
+        if (
+            (nullptr == pDcvm) 
+            || (nullptr == pOAuthCode) 
+            || (nullptr == pOAuthCode->pClientId) 
+            || (nullptr == pOAuthCode->pOAuthCode)
+        )
+        {
+            DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
+            return DCVM_ERR_BAD_PARAMS;
+        }
+
+        return pDcvm->cloudDiskManager.AuthorizeClient(pOAuthCode->pClientId, pOAuthCode->pOAuthCode, pCtxt);
+    }
+
+    DCVM_ERROR dcvm_InitCloudDisk(
+        struct DCVM             *pDcvm
+        , const dcvm_char_t     *pClientId
+        , const dcvm_uint64_t   flags
+        , struct DCVMCloudDisk  **ppCloudDisk
+        , struct DCVMContext    *pCtxt
+    )
+    {
+        if ((nullptr == pDcvm) || (nullptr == pClientId) || (nullptr == ppCloudDisk))
+        {
+            DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
+            return DCVM_ERR_BAD_PARAMS;
+        }
+
+        dcvm::clouddisk::objects::CloudDiskDirectory *pRootDir = nullptr;
+        dcvm::clouddisk::ICloudDisk *pCloudDisk = nullptr;
+
+        DCVM_ERROR err = pDcvm->cloudDiskManager.InitCloudDisk(pClientId, flags, pRootDir, pCloudDisk, pCtxt);
+        if (DCVM_FAILED(err))
+        {
+            return err;
+        }
+
+        *ppCloudDisk = new DCVMCloudDisk();
+        if (nullptr == *ppCloudDisk)
+        {
+            DCVM_ERROR_TRACE(DCVM_ERR_INSUFFICIENT_RESOURCES);
+
+            pRootDir->DecReff(pCtxt);
+            pCloudDisk->Unmount(pCtxt);
+
+            return DCVM_ERR_INSUFFICIENT_RESOURCES;
+        }
+
+        (*ppCloudDisk)->pCloudDisk = pCloudDisk;
+        (*ppCloudDisk)->pRootDir = pRootDir;
+
+        return DCVM_ERR_SUCCESS;
+    }
+
+    DCVM_ERROR dcvm_InitLogicalCloudDisk(
+        struct DCVM                 *pDcvm
+        , const dcvm_char_t* const  *ppClientIds
+        , const dcvm_size_t         amountClients
+        , const dcvm_size_t         flags
+        , DCVMCloudDisk             **ppCloudDisk
+        , struct DCVMContext        *pCtxt
+    )
+    {
+        if ((nullptr == pDcvm) || ((nullptr == ppClientIds) && (0 != amountClients)) || (nullptr == ppCloudDisk))
+        {
+            DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
+            return DCVM_ERR_BAD_PARAMS;
+        }
+
+        if (0 == amountClients)
+        {
+            *ppCloudDisk = nullptr;
+            return DCVM_ERR_SUCCESS;
+        }
+
+        dcvm::clouddisk::objects::CloudDiskDirectory *pRootDir = nullptr;
+        dcvm::clouddisk::ICloudDisk *pCloudDisk = nullptr;
+
+        dcvm::base::DCVMVector_t<dcvm::base::DCVMString_t> clients;
+        for (int i = 0; i < amountClients; i++)
+        {
+            clients.push_back(ppClientIds[i]);
+        }
+
+        DCVM_ERROR err = pDcvm->cloudDiskManager.InitCloudDisk(clients, flags, pRootDir, pCloudDisk, pCtxt);
+        if (DCVM_FAILED(err))
+        {
+            return err;
+        }
+
+        *ppCloudDisk = new DCVMCloudDisk();
+        if (nullptr == *ppCloudDisk)
+        {
+            DCVM_ERROR_TRACE(DCVM_ERR_INSUFFICIENT_RESOURCES);
+
+            pRootDir->DecReff(pCtxt);
+            pCloudDisk->Unmount(pCtxt);
+
+            return DCVM_ERR_INSUFFICIENT_RESOURCES;
+        }
+
+        (*ppCloudDisk)->pCloudDisk = pCloudDisk;
+        (*ppCloudDisk)->pRootDir = pRootDir;
+
+        return DCVM_ERR_SUCCESS;
+    }
+
+    DCVM_ERROR dcvm_ControlReleaseCloudDisk(struct DCVM *pDcvm, struct DCVMCloudDisk *pCloudDisk, struct DCVMContext *pCtxt)
+    {
+        if ((nullptr == pDcvm) || (nullptr == pCloudDisk))
+        {
+            DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
+            return DCVM_ERR_BAD_PARAMS;
+        }
+
+        auto cnt = pCloudDisk->pRootDir->DecReff(pCtxt);
+        if (cnt > 1)
+        {
+            DCVM_INFO_TRACE("Refference counter of the root directory is gteater than 1. Possible, close operation has not been called.");
+        }
+
+        DCVM_ERROR err = pCloudDisk->pCloudDisk->Unmount(pCtxt);
+        if (DCVM_FAILED(err))
+        {
+            return err;
+        }
+
+        cnt = pCloudDisk->pCloudDisk->DecReff(pCtxt);
+        if (cnt > 1)
+        {
+            DCVM_INFO_TRACE("Refference counter of the cloud disk instance is gteater than 1. Possible, DecReff operation has not been called.");
+        }
+
+        pCloudDisk->pRootDir = nullptr;
+        pCloudDisk->pCloudDisk = nullptr;
 
         return DCVM_ERR_SUCCESS;
     }
