@@ -1,7 +1,7 @@
 #ifndef DCVM_BASE_SYSTEMAPI_HPP_
 #define DCVM_BASE_SYSTEMAPI_HPP_
 
-#include <dcvm/dcvm_system.h>
+#include <dcvm/DCVMSystemAPI.h>
 #include <dcvm/DCVMTypes.h>
 
 namespace dcvm {

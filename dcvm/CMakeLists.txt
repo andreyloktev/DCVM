@@ -55,7 +55,7 @@ if(module_tests)
     add_executable(${module_name}_test ${module_tests})
     enable_testing()
     find_package(GTest REQUIRED)
-    target_link_libraries(${module_name}_test PRIVATE GTest::GTest GTest::Main)
+    target_link_libraries(${module_name}_test PRIVATE ${module_name} GTest::GTest GTest::Main)
     add_test(AllTestsInMain ${module_name}_test)
 endif()
 

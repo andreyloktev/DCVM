@@ -7,7 +7,7 @@
 
 namespace dcvm {
 
-DCVMSystemAPI g_pSystemApi = {};
+DCVMSystemAPI g_systemApi = {};
 using CloudDiskManager_t = dcvm::clouddiskmanager::CloudDiskManager;
 
 namespace
@@ -54,10 +54,17 @@ struct DCVMCloudDisk final : public dcvm::base::MemoryBase
     dcvm::clouddisk::objects::CloudDiskDirectory    *pRootDir   = nullptr;
 };
 
-
+DCVMPrintError  g_DCVMPrintError = nullptr;
+DCVMPrintInfo   g_DCVMPrintInfo = nullptr;
 
 extern "C"
 {
+    void dcvm_InitLogger(DCVMPrintError pErrLogger, DCVMPrintInfo pInfoLogger) noexcept
+    {
+        g_DCVMPrintError = pErrLogger;
+        g_DCVMPrintInfo = pInfoLogger;
+    }
+
     DCVM_ERROR dcvm_Init(DCVMSystemAPI systemApi, DCVM **ppDcvm, struct DCVMContext *pCtxt) noexcept
     {
         UNREFFERENCE_VARIABLE(pCtxt);
@@ -68,7 +75,7 @@ extern "C"
             return DCVM_ERR_BAD_PARAMS;
         }
 
-        dcvm::g_pSystemApi = systemApi;
+        dcvm::g_systemApi = systemApi;
 
         *ppDcvm = new DCVM();
         if (nullptr == *ppDcvm)

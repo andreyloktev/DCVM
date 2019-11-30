@@ -94,7 +94,7 @@ DCVM_ERROR CloudDiskManager::GetUnauthorizedClients(
             return err;
         }
 
-        auto item = eastl::make_pair(client.first, uri);
+        auto item = base::DCVMMakePair(client.first, uri);
         clients.emplace_back(item);
     }
 

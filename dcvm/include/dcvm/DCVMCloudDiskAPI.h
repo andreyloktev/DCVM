@@ -3,7 +3,7 @@
 
 #include "DCVMTypes.h"
 #include "DCVMError.h"
-#include "dcvm_system.h"
+#include "DCVMSystemAPI.h"
 
 typedef struct _OAuthToken
 {

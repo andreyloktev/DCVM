@@ -12,14 +12,16 @@ set(module_public_headers
     include/dcvm/DCVMLogger.h
     include/dcvm/DCVMTypes.h
     include/dcvm/DCVMCloudDiskAPI.h
-    include/dcvm/dcvm_system.h
+    include/dcvm/DCVMSystemAPI.h
 )
 
 # Private module headers
 set(module_private_headers
     src/base/dcvm_defines.hpp
     src/base/DCVMTypes.hpp
+    src/base/DCVMFunctions.hpp
     src/base/EASTLAllocator.hpp
+    src/base/STLAllocator
     src/base/ICloudDiskUnknown.hpp
     src/base/MemoryBase.hpp
     src/base/NameValuePair.hpp
@@ -48,12 +50,17 @@ set(module_defines
 
 #Module tests
 set(module_tests
-    test/foo_test.cpp
+    test/dcvm_systemapi_test.h
+    test/dcvm_systemapi_test.cpp
+    test/dcvm_control_utest.cpp
+    test/dcvm_cloudstorage_stub.hpp
+    test/dcvm_cloudstorage_stub.cpp
 )
 
 # Module dependency
 set(module_dependency
-    eastl
+# Uncomment eastl if DCVM_USE_EASTL is defined.
+#    eastl
 )
 
 # Module external dependency(get via vcpkg)

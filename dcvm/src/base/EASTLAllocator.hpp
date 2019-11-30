@@ -8,9 +8,6 @@ namespace base {
 
 class EASTLAllocator final
 {
-    static constexpr const char *ALLOCATOR_NAME = "DCVM";
-private:
-    const char *m_pName = nullptr;
 public:
     explicit EASTLAllocator(const char *pName) noexcept: m_pName(pName ? pName : ALLOCATOR_NAME)
     {
@@ -108,19 +105,23 @@ public:
     {
         m_pName = pName;
     }
+private:
+    static constexpr const char *ALLOCATOR_NAME = "DCVM";
+private:
+    const char *m_pName = nullptr;
 };
 
 inline bool operator==(
-    const dcvm::base::EASTLAllocator     &a
-    , const dcvm::base::EASTLAllocator   &b
+    const EASTLAllocator     &a
+    , const EASTLAllocator   &b
 ) noexcept
 {
     return &a == &b;
 }
 
 inline bool operator!=(
-    const dcvm::base::EASTLAllocator     &a
-    , const dcvm::base::EASTLAllocator   &b
+    const EASTLAllocator     &a
+    , const EASTLAllocator   &b
 ) noexcept
 {
     return &a != &b;

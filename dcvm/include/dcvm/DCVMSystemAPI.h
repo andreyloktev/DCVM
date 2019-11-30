@@ -4,11 +4,11 @@
 #include "DCVMTypes.h"
 #include "DCVMError.h"
 
-typedef struct _NameValue
+typedef struct _DCVMNameValue
 {
     const dcvm_char_t *pName;
     const dcvm_char_t *pValue;
-} NameValue;
+} DCVMNameValue;
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,7 +70,7 @@ typedef void (*DCVMMemorySet)(void *pBlock, dcvm_size_t size, dcvm_uint8_t value
 typedef enum DCVM_ERROR (*DCVMSendHttpRequest)(
     const dcvm_char_t       *pMethod
     , const dcvm_char_t     *pUri
-    , const NameValue       *pHeaders
+    , const DCVMNameValue   *pHeaders
     , dcvm_size_t           amountHeaders
     , const dcvm_uint8_t    *pBody
     , dcvm_size_t           bodySize
