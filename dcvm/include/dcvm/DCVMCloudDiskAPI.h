@@ -19,8 +19,10 @@ enum DCVMFileType
     , DCVM_SymbolicLink
 };
 
-#define FILE_NAME_SIZE 256
-#define FILE_FLAG_READ_ONLY 0x00000001
+#define FILE_NAME_SIZE          256
+#define CLOUD_PROVIDER_ID_SIZE  1024;
+#define USER_NAME_SIZE          1024;
+#define FILE_FLAG_READ_ONLY     0x00000001
 
 typedef struct _DCVMFileInfo
 {
@@ -32,11 +34,25 @@ typedef struct _DCVMFileInfo
     dcvm_uint64_t       modificationTime;
 } DCVMFileInfo;
 
+typedef struct _DCVMCloudProviderInfo
+{
+    dcvm_char_t id[CLOUD_PROVIDER_ID_SIZE];
+} DCVMCloudProviderInfo;
+
+typedef struct _DCVMUserInfo
+{
+    dcvm_char_t name[USER_NAME_SIZE];
+} DCVMUserInfo;
+
 typedef struct _DCVMCloudDiskInfo
 {
+    DCVMCloudProviderInfo providerInfo;
+    DCVMUserInfo userInfo;
     dcvm_uint64_t maxFileSize;
     dcvm_uint64_t totalSpace;
     dcvm_uint64_t usedSpace;
+    dcvm_uint32_t childrenCount;
+    struct _DCVMCloudDiskInfo children[1];
 } DCVMCloudDiskInfo;
 
 #ifdef __cplusplus
