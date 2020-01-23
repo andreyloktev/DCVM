@@ -1,0 +1,37 @@
+
+# Module name (REQUIRED)
+set(module_name dcvm)
+
+# Module type(library or executable. Default is library)
+set(module_type library)
+
+# Public module headers
+set(module_public_headers
+    include/dcvm_cpp/dcvm.hpp
+)
+
+# Private module headers
+set(module_private_headers
+)
+
+# Module sources
+set(module_sources
+    src/dcvm.cpp
+)
+
+# Module defines
+set(module_defines
+)
+
+#Module tests
+set(module_tests
+)
+
+# Module dependency
+set(module_dependency
+    dcvm
+)
+
+# Module external dependency(get via vcpkg)
+set(module_external_dependency
+)

@@ -15,16 +15,18 @@
 enum DCVM_ERROR
 {
     DCVM_ERR_SUCCESS
-    , DCVM_ERR_NOT_INITIALIZED                      = MAKE_DCVM_ERROR(0x1)
-    , DCVM_ERR_NOT_IMPLEMENTED                      = MAKE_DCVM_ERROR(0x2)
-    , DCVM_ERR_BAD_PARAMS                           = MAKE_DCVM_ERROR(0x3)
-    , DCVM_ERR_INSUFFICIENT_RESOURCES               = MAKE_DCVM_ERROR(0x4)
-    , DCVM_ERR_INTERNAL                             = MAKE_DCVM_ERROR(0x5)
-    , DCVM_ERR_CANNOT_LOG_IN                        = MAKE_DCVM_ERROR(0x6)
-    , DCVM_ERR_CLIENT_ALREADY_EXISTS                = MAKE_DCVM_ERROR(0x7)
-    , DCVM_ERR_CLIENT_DOES_NOT_EXIST                = MAKE_DCVM_ERROR(0x8)
-    , DCVM_ERR_CLIENT_HAS_BEEN_ALREADY_AUTHORIZED   = 0x9
-    , DCVM_ERR_CLIENT_IS_NOT_AUTHORIZED             = MAKE_DCVM_ERROR(0xa)
+    , DCVM_ERR_NOT_INITIALIZED                              = MAKE_DCVM_ERROR(0x1)
+    , DCVM_ERR_NOT_IMPLEMENTED                              = MAKE_DCVM_ERROR(0x2)
+    , DCVM_ERR_BAD_PARAMS                                   = MAKE_DCVM_ERROR(0x3)
+    , DCVM_ERR_INSUFFICIENT_RESOURCES                       = MAKE_DCVM_ERROR(0x4)
+    , DCVM_ERR_INTERNAL                                     = MAKE_DCVM_ERROR(0x5)
+    , DCVM_ERR_CANNOT_LOG_IN                                = MAKE_DCVM_ERROR(0x6)
+    , DCVM_ERR_PROVIDER_ID_IS_NOT_UNIQUE                    = MAKE_DCVM_ERROR(0x7)
+    , DCVM_ERR_PROVIDER_IS_NOT_FOUND                        = MAKE_DCVM_ERROR(0x8)
+    , DCVM_ERR_CLOUDDISK_IS_NOT_FOUND                       = MAKE_DCVM_ERROR(0x9)
+    , DCVM_ERR_CLOUDDISK_HAS_BEEN_ALREADY_AUTHENTICATED     = 0xa
+    , DCVM_ERR_CLOUDDISK_IS_NOT_AUTHORIZED                  = MAKE_DCVM_ERROR(0xb)
+    , DCVM_ERR_FILE_IS_NOT_DIRECTORY                        = MAKE_DCVM_ERROR(0xc)
 };
 
 const char* DCVMErrorToString(enum DCVM_ERROR err);

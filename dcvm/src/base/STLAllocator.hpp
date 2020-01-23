@@ -41,7 +41,7 @@ public:
         return &x;
     }
 
-    pointer allocate(size_type n, std::allocator<void>::const_pointer hint = 0) noexcept
+    pointer allocate(size_type n, const_pointer hint = 0) noexcept
     {
         return static_cast<pointer>(::malloc(sizeof(T) * n));
     }

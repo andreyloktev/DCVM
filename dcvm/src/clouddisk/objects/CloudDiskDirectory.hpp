@@ -16,7 +16,7 @@ public:
      * @brief Constructor.
      * @param pCloudDisk cloud disk which it belongs to.
     */
-    CloudDiskDirectory(const DCVMFileInfo &fileInfo, ICloudDisk *pCloudDisk) noexcept;
+    CloudDiskDirectory(const DCVMFileInfo &fileInfo, struct DCVMHandle *pCloudFileObject, ICloudDisk *pCloudDisk) noexcept;
 
     DCVM_ERROR Flush(struct DCVMContext *pCtxt) noexcept override final;
 

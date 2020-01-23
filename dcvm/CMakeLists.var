@@ -11,7 +11,7 @@ set(module_public_headers
     include/dcvm/DCVMError.h
     include/dcvm/DCVMLogger.h
     include/dcvm/DCVMTypes.h
-    include/dcvm/DCVMCloudDiskAPI.h
+    include/dcvm/DCVMCloudProviderAPI.h
     include/dcvm/DCVMSystemAPI.h
 )
 
@@ -26,6 +26,7 @@ set(module_private_headers
     src/base/MemoryBase.hpp
     src/base/NameValuePair.hpp
     src/base/SystemApi.hpp
+    src/base/CloudProvider.hpp
     src/clouddisk/objects/CloudDiskDirectory.hpp
     src/clouddisk/objects/CloudDiskFile.hpp
     src/clouddisk/objects/CloudDiskObject.hpp
@@ -55,6 +56,8 @@ set(module_tests
     test/dcvm_control_utest.cpp
     test/dcvm_cloudstorage_stub.hpp
     test/dcvm_cloudstorage_stub.cpp
+    test/dcvm_utest_helper.hpp
+    test/DCVMCloudProvider.hpp
 )
 
 # Module dependency

@@ -2,9 +2,10 @@
 #define DCVM_CORE_CLOUDDSIKMANAGER_CLOUDDISKMANAGER_HPP_
 
 #include <dcvm/DCVMError.h>
-#include <dcvm/DCVMCloudDiskAPI.h>
+#include <dcvm/DCVMCloudProviderAPI.h>
 #include "../base/DCVMTypes.hpp"
 #include "../base/MemoryBase.hpp"
+#include "../base/CloudProvider.hpp"
 #include "../CloudDisk/ICloudDisk.hpp"
 
 namespace dcvm              {
@@ -23,48 +24,77 @@ public:
     CloudDiskManager& operator=(const CloudDiskManager&) = delete;
 public:
     /*!
-     * @brief Add a client.
-     * @param [in] client cloud disk clent.
-     * @param [int, out] clientId client id.
+     * @brief Add a provider.
+     * @param [in] provider cloud disk clent.
      * @param [in] pCtxt system context(optional).
-     * @return error code.
+     * @return provider id.
     */
-    DCVM_ERROR AddClient(DCVMCloudDiskAPI client, base::DCVMString_t &clientId, struct DCVMContext *pCtxt) noexcept;
-
-    /*!
-     * Get all authorized clients.
-     * @param [in] pCtxt system context(optional).
-     * @return list of all clients.
-    */
-    base::DCVMVector_t<base::DCVMString_t> GetClients(struct DCVMContext *pCtxt) const noexcept;
-
-    /*!
-     * Get all unauthorized clients.
-     * @param [out] clients array <client id, OAuth url> of all unauthorized clients.
-     * @param [in] pCtxt system context(optional).
-     * @return error code.
-    */
-    DCVM_ERROR GetUnauthorizedClients(
-        base::DCVMVector_t<base::DCVMPair_t<base::DCVMString_t, base::DCVMString_t>>    &clients
-        , struct DCVMContext                                                            *pCtxt
-    ) const noexcept;
-
-    /*!
-     * Authorize a client.
-     * @param [in] clientId client unique identifier.
-     * @param [in] oauthCode authentication code.
-     * @param [in] pCtxt system context(optional).
-     * @return list <client id, OAuth url> of all unauthorized clients.
-    */
-    DCVM_ERROR AuthorizeClient(
-        const base::DCVMString_t    &clientId
-        , const base::DCVMString_t  &oauthCode
+    DCVM_ERROR AddCloudProvider(
+        DCVMCloudProviderAPI        provider
+        , base::DCVMStringView_t    &providerId
         , struct DCVMContext        *pCtxt
     ) noexcept;
 
     /*!
+     * Get list of cloud providers.
+     * @param [in] pCtxt system context(optional).
+     * @return list of provider ids.
+    */
+   base::DCVMVector_t<base::DCVMStringView_t> GetCloudProviders(struct DCVMContext *pCtxt) const noexcept;
+
+    /*!
+     * Get authorization uri.
+     * @param [in] providerId provder id.
+     * @param [out] uri authorization uri.
+     * @param [in] pCtxt system context(optional).
+     * @return error code.
+    */
+    DCVM_ERROR GetAuthorizationUri(
+        const base::DCVMStringView_t  &providerId
+        , base::DCVMString_t        &uri
+        , struct DCVMContext        *pCtxt
+    ) const noexcept;
+
+    /*!
+     * Create a cloud disk.
+     * @param [in] providerId provider unique identifier.
+     * @param [in] oauthCode authentication code.
+     * @param [out] cloudDiskId id of created cloud disk.
+     * @param [in] pCtxt system context(optional).
+     * @return error code.
+    */
+    DCVM_ERROR CreateCloudDisk(
+        const base::DCVMStringView_t    &providerId
+        , const base::DCVMStringView_t  &oauthCode
+        , dcvm_size_t                   &cloudDiskId
+        , struct DCVMContext            *pCtxt
+    ) noexcept;
+
+    /*!
+     * Get all cloud disks.
+     * @param [in] pCtxt system context(optional).
+     * @return list of all cloud disk ids.
+    */
+    base::DCVMVector_t<dcvm_size_t> GetCloudDisks(struct DCVMContext *pCtxt) const noexcept;
+
+    /*!
+     * Get a cloud disk information by its id.
+     * @param [in] id cloud disk id.
+     * @param [in, out] pCloudDiskInfo pointer to the buffer that recieve information about the cloud disk.
+     * @param [in, out] size size of pCloudDiskInfo buffer. If pCloudDiskInfo is nullptr then size recieves necessary size of pCloudDiskInfo buffer.
+     * @param [in] pCtxt system context(optional).
+     * @return error code.
+    */
+    DCVM_ERROR GetCloudDiskInformation(
+        const dcvm_size_t       id
+        , DCVMCloudDiskInfo     *pCloudDiskInfo
+        , dcvm_size_t           &size
+        , struct DCVMContext    *pCtxt
+    ) const noexcept;
+
+    /*!
      * Create a cloud disk instance.
-     * @param [in] clientId client id.
+     * @param [in] cloudDiskId cloud disk id.
      * @param [in] flags initialization flags.
      * @param [out] pRootDir pointer to root directory.
      * @param [out] pCloudDisk cloud disk instance
@@ -72,7 +102,7 @@ public:
      * @return error code.
     */
    DCVM_ERROR InitCloudDisk(
-       const base::DCVMString_t                     &clientId
+       const dcvm_size_t                            cloudDiskId
        , const dcvm_uint64_t                        flags
        , clouddisk::objects::CloudDiskDirectory*    &pRootDir
        , clouddisk::ICloudDisk*                     &pCloudDisk
@@ -81,15 +111,15 @@ public:
 
    /*!
      * Create a cloud disk instance.
-     * Created a cloud disk instance works with several DCVMCloudDiskAPI clients -- represent all clients in one.
-     * @param [in] clientIds list of client ids.
+     * Created a cloud disk instance works with several DCVMCloudDiskProviderAPI clients -- represent all clients in one.
+     * @param [in] cloudDisksIds list of cloud disks ids.
      * @param [out] pRootDir pointer to root directory.
      * @param [out] pCloudDisk cloud disk instance.
      * @param [in] pCtxt system context(optional).
      * @return error code.
     */
    DCVM_ERROR InitCloudDisk(
-       const base::DCVMVector_t<base::DCVMString_t> &clientIds
+       const base::DCVMVector_t<dcvm_size_t>        &cloudDisksIds
        , const dcvm_uint64_t                        flags
        , clouddisk::objects::CloudDiskDirectory*    &pRootDir
        , clouddisk::ICloudDisk*                     &pCloudDisk
@@ -98,10 +128,11 @@ public:
 
 private:
     using ICloudDisk_t = clouddisk::ICloudDisk;
-    using DCVMCloudDisksPool = base::DCVMMap_t<base::DCVMString_t, ICloudDisk_t*>;
+    using DCVMCloudDisksPool = base::DCVMUnorderedMap_t<dcvm_size_t, ICloudDisk_t*>;
+    using DCVMCloudDiskProvidersPool = base::DCVMUnorderedMap_t<base::DCVMStringView_t, base::CloudProvider>;
 private:
-    DCVMCloudDisksPool m_clients; /// All unauthorized clients.
-    DCVMCloudDisksPool m_authorzedClients; /// All authorized clients.
+    DCVMCloudDisksPool m_cloudDisks;
+    DCVMCloudDiskProvidersPool m_providers;
 };
 
 } // namespace clouddiskmanager

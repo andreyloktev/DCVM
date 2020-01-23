@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+
 #include <dcvm/DCVMLogger.h>
 #include "CloudDiskManager.hpp"
 #include "../clouddisk/CloudDisk.hpp"
@@ -12,154 +16,189 @@ CloudDiskManager::CloudDiskManager() noexcept
 
 CloudDiskManager::~CloudDiskManager() noexcept
 {
-    //TODO: Add logic for saving refresh tokens
+    for (auto& cloudDisk : m_cloudDisks)
+    {
+        if (nullptr != cloudDisk.second)
+        {
+            cloudDisk.second->DecReff(nullptr);
+        }
+    }
 }
 
-DCVM_ERROR CloudDiskManager::AddClient(DCVMCloudDiskAPI client, base::DCVMString_t &clientId, struct DCVMContext *pCtxt) noexcept
+DCVM_ERROR CloudDiskManager::AddCloudProvider(
+    DCVMCloudProviderAPI        provider
+    , base::DCVMStringView_t    &providerId
+    , struct DCVMContext        *pCtxt
+) noexcept
 {
     UNREFFERENCE_VARIABLE(pCtxt);
 
-    if ((nullptr == client.GetCloudDiskId) || (0 == *(client.GetCloudDiskId(pCtxt))))
+    if ((nullptr == provider.GetProviderId) || (nullptr == provider.GetProviderId(pCtxt)))
     {
-        DCVM_INFO_TRACE("Bad parameters. DCVMCloudDiskAPI::GetCloudDiskId is NULL or id is empty string");
-        DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
+        DCVM_INFO_TRACE("Bad parameters. DCVMCloudDiskProviderAPI::GetCloudDiskId is NULL or id is empty string");
+        DCVM_ERROR_TRACE(DCVM_ERR_PROVIDER_ID_IS_NOT_UNIQUE);
 
-        return DCVM_ERR_BAD_PARAMS;
+        return DCVM_ERR_PROVIDER_ID_IS_NOT_UNIQUE;
     }
 
-    auto it = m_clients.find(client.GetCloudDiskId(pCtxt));
-    if (m_clients.cend() != it)
+    providerId = provider.GetProviderId(pCtxt);
+    if (providerId.empty())
     {
-        DCVM_ERROR_TRACE(DCVM_ERR_CLIENT_ALREADY_EXISTS);
-        return DCVM_ERR_CLIENT_ALREADY_EXISTS;
+        DCVM_INFO_TRACE("Provider id is empty.");
+        return DCVM_ERR_PROVIDER_ID_IS_NOT_UNIQUE;
     }
 
-    auto pCloudDisk = new clouddisk::CloudDisk(client);
+    auto it = m_providers.find(providerId.data());
+    if (m_providers.cend() != it)
+    {
+        DCVM_ERROR_TRACE(DCVM_ERR_PROVIDER_ID_IS_NOT_UNIQUE);
+        return DCVM_ERR_PROVIDER_ID_IS_NOT_UNIQUE;
+    }
+
+    m_providers.insert(base::DCVMMakePair(providerId.data(), base::CloudProvider(provider)));
+
+    return DCVM_ERR_SUCCESS;
+}
+
+base::DCVMVector_t<base::DCVMStringView_t> CloudDiskManager::GetCloudProviders(struct DCVMContext *pCtxt) const noexcept
+{
+    UNREFFERENCE_VARIABLE(pCtxt);
+
+    base::DCVMVector_t<base::DCVMStringView_t> providers;
+
+    if (m_providers.empty())
+    {
+        return providers;
+    }
+
+    providers.reserve(m_providers.size());
+
+    for (const auto &provider : m_providers)
+    {
+        providers.push_back(provider.first);
+    }
+
+    return providers;
+}
+
+DCVM_ERROR CloudDiskManager::GetAuthorizationUri(
+    const base::DCVMStringView_t    &providerId
+    , base::DCVMString_t            &uri
+    , struct DCVMContext            *pCtxt
+) const noexcept
+{
+    auto itProvider = m_providers.find(providerId);
+    if (m_providers.cend() == itProvider)
+    {
+        return DCVM_ERR_PROVIDER_IS_NOT_FOUND;
+    }
+
+    return itProvider->second.GetOAuthUri(uri, pCtxt);
+}
+
+DCVM_ERROR CloudDiskManager::CreateCloudDisk(
+    const base::DCVMStringView_t    &providerId
+    , const base::DCVMStringView_t  &oauthCode
+    , dcvm_size_t                   &cloudDiskId
+    , struct DCVMContext            *pCtxt
+) noexcept
+{
+    auto itProvider = m_providers.find(providerId);
+    if (m_providers.cend() == itProvider)
+    {
+        DCVM_ERROR_TRACE(DCVM_ERR_INSUFFICIENT_RESOURCES);
+        return DCVM_ERR_PROVIDER_IS_NOT_FOUND;
+    }
+
+    auto pCloudDisk = new clouddisk::CloudDisk(itProvider->second);
     if (nullptr == pCloudDisk)
     {
         DCVM_ERROR_TRACE(DCVM_ERR_INSUFFICIENT_RESOURCES);
         return DCVM_ERR_INSUFFICIENT_RESOURCES;
     }
 
-    clientId = client.GetCloudDiskId(pCtxt);
-    m_clients.insert(base::DCVMPair_t<base::DCVMString_t, ICloudDisk_t*>(clientId, pCloudDisk));
-
-    return DCVM_ERR_SUCCESS;
-}
-
-base::DCVMVector_t<base::DCVMString_t> CloudDiskManager::GetClients(struct DCVMContext *pCtxt) const noexcept
-{
-    UNREFFERENCE_VARIABLE(pCtxt);
-
-    base::DCVMVector_t<base::DCVMString_t> clients;
-
-    if (m_authorzedClients.empty())
-    {
-        return clients;
-    }
-
-    clients.reserve(m_authorzedClients.size());
-
-    for (const auto &client : m_authorzedClients)
-    {
-        clients.push_back(client.first);
-    }
-
-    return clients;
-}
-
-DCVM_ERROR CloudDiskManager::GetUnauthorizedClients(
-    base::DCVMVector_t<base::DCVMPair_t<base::DCVMString_t, base::DCVMString_t>>    &clients
-    , struct DCVMContext                                                            *pCtxt
-) const noexcept
-{
-    UNREFFERENCE_VARIABLE(pCtxt);
-    
-    if (m_clients.empty())
-    {
-        return DCVM_ERR_SUCCESS;
-    }
-
-    DCVM_ERROR err = DCVM_ERR_SUCCESS;
-    base::DCVMString_t uri;
-    clients.reserve(m_clients.size());
-
-    for (const auto &client : m_clients)
-    {
-        err = client.second->GetOAuthUri(uri, pCtxt);
-        if (DCVM_FAILED(err))
-        {
-            DCVM_ERROR_TRACE(err);
-            clients.clear();
-            return err;
-        }
-
-        auto item = base::DCVMMakePair(client.first, uri);
-        clients.emplace_back(item);
-    }
-
-    return err;
-}
-
-DCVM_ERROR CloudDiskManager::AuthorizeClient(
-    const base::DCVMString_t    &clientId
-    , const base::DCVMString_t  &oauthCode
-    , struct DCVMContext        *pCtxt
-) noexcept
-{
-    if (clientId.empty() || oauthCode.empty())
-    {
-        DCVM_INFO_TRACE("\"clientId\" or \"oauthCode\" or both are empty.");
-        DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
-        return DCVM_ERR_BAD_PARAMS;
-    }
-
-    auto it = m_authorzedClients.find(clientId);
-    if (m_authorzedClients.cend() != it)
-    {
-        return DCVM_ERR_CLIENT_HAS_BEEN_ALREADY_AUTHORIZED;
-    }
-
-    it = m_clients.find(clientId);
-    if (m_clients.cend() == it)
-    {
-        DCVM_ERROR_TRACE(DCVM_ERR_CLIENT_DOES_NOT_EXIST);
-        return DCVM_ERR_CLIENT_DOES_NOT_EXIST;
-    }
-
-    base::DCVMString_t refreshToken; ///TODO Now refresh token is not used. But later saving refresh token and auto login will be added.
-    DCVM_ERROR err = it->second->LogInWithOAuthCode(oauthCode, refreshToken, pCtxt);
+    auto err = pCloudDisk->LogInWithOAuthCode(oauthCode, pCtxt);
     if (DCVM_FAILED(err))
     {
         DCVM_ERROR_TRACE(err);
+        pCloudDisk->DecReff(pCtxt);
         return err;
     }
 
-    m_authorzedClients.insert(*it);
+    DCVMCloudDiskInfo di = {};
+    dcvm_size_t diSize = sizeof(di);
+
+    err = pCloudDisk->CloudGetDiskInfo(&di, diSize, pCtxt);
+    if (DCVM_FAILED(err))
+    {
+        DCVM_ERROR_TRACE(err);
+        pCloudDisk->DecReff(pCtxt);
+        return err;
+    }
+
+    cloudDiskId = base::DCVMHash<base::DCVMString_t>()(base::DCVMString_t(di.providerInfo.id) + DCVM_TEXT("_") + di.userInfo.name);
+
+    m_cloudDisks.insert(base::DCVMMakePair(cloudDiskId, pCloudDisk));
 
     return err;
 }
 
+base::DCVMVector_t<dcvm_size_t> CloudDiskManager::GetCloudDisks(struct DCVMContext *pCtxt) const noexcept
+{
+    UNREFFERENCE_VARIABLE(pCtxt);
+    
+    base::DCVMVector_t<dcvm_size_t> cloudDisks;
+
+    if (m_cloudDisks.empty())
+    {
+        return cloudDisks;
+    }
+
+    cloudDisks.reserve(m_cloudDisks.size());
+
+    for (const auto &cloudDisk : m_cloudDisks)
+    {
+        cloudDisks.push_back(cloudDisk.first);
+    }
+
+    return cloudDisks;
+}
+
+DCVM_ERROR CloudDiskManager::GetCloudDiskInformation(
+    const dcvm_size_t       id
+    , DCVMCloudDiskInfo     *pCloudDiskInfo
+    , dcvm_size_t           &size
+    , struct DCVMContext    *pCtxt
+) const noexcept
+{
+    auto itCloudDisk = m_cloudDisks.find(id);
+    if (m_cloudDisks.cend() == itCloudDisk)
+    {
+        return DCVM_ERR_CLOUDDISK_IS_NOT_FOUND;
+    }
+
+    if (nullptr == itCloudDisk->second)
+    {
+        DCVM_INFO_TRACE("Cloud disk instance is nullptr");
+        return DCVM_ERR_BAD_PARAMS;
+    }
+
+    return itCloudDisk->second->CloudGetDiskInfo(pCloudDiskInfo, size, pCtxt);
+}
+
 DCVM_ERROR CloudDiskManager::InitCloudDisk(
-    const base::DCVMString_t                     &clientId
+    const dcvm_size_t                           cloudDiskId
     , const dcvm_uint64_t                        flags
     , clouddisk::objects::CloudDiskDirectory*    &pRootDir
     , clouddisk::ICloudDisk*                     &pCloudDisk
     , struct DCVMContext                         *pCtxt
 ) const noexcept
 {
-    if (clientId.empty())
+    auto it = m_cloudDisks.find(cloudDiskId);
+    if (m_cloudDisks.cend() == it)
     {
-        DCVM_INFO_TRACE("\"clientId\" is empty.");
-        DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
-        return DCVM_ERR_BAD_PARAMS;
-    }
-
-    auto it = m_authorzedClients.find(clientId);
-    if (m_authorzedClients.cend() == it)
-    {
-        DCVM_ERROR_TRACE(DCVM_ERR_CLIENT_IS_NOT_AUTHORIZED);
-        return DCVM_ERR_CLIENT_IS_NOT_AUTHORIZED;
+        DCVM_ERROR_TRACE(DCVM_ERR_CLOUDDISK_IS_NOT_FOUND);
+        return DCVM_ERR_CLOUDDISK_IS_NOT_FOUND;
     }
 
     DCVM_ERROR err = it->second->Mount(flags, pRootDir, pCtxt);
@@ -178,14 +217,14 @@ DCVM_ERROR CloudDiskManager::InitCloudDisk(
 }
 
 DCVM_ERROR CloudDiskManager::InitCloudDisk(
-    const base::DCVMVector_t<base::DCVMString_t> &clientIds
+    const base::DCVMVector_t<dcvm_size_t>        &cloudDisksIds
     , const dcvm_uint64_t                        flags
     , clouddisk::objects::CloudDiskDirectory*    &pRootDir
     , clouddisk::ICloudDisk*                     &pCloudDisk
     , struct DCVMContext                         *pCtxt
 ) const noexcept
 {
-    UNREFERENCED_PARAMETER(clientIds);
+    UNREFERENCED_PARAMETER(cloudDisksIds);
     UNREFERENCED_PARAMETER(flags);
     UNREFERENCED_PARAMETER(pRootDir);
     UNREFERENCED_PARAMETER(pCloudDisk);

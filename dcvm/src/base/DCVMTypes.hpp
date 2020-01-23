@@ -12,6 +12,7 @@
 #include "EASTLAllocator.hpp"
 #else
 #include <string>
+#include <string_view>
 #include <vector>
 #include <unordered_map>
 #include <map>
@@ -24,6 +25,8 @@ namespace base {
 #ifdef DCVM_USE_EASTL
 
 using DCVMString_t = eastl::basic_string<dcvm_char_t, EASTLAllocator>;
+
+using DCVMStringView_t = eastl::string_view<dcvm_char_t>;
 
 template <typename T>
 using DCVMVector_t = eastl::vector<T, EASTLAllocator>;
@@ -62,6 +65,27 @@ struct DCVMHash<DCVMString_t> final
     }
 };
 
+template <>
+struct DCVMHash<DCVMStringView_t> final
+{
+    /*!
+     * @brief Calculate a hash of string according to article http://www.cse.yorku.ca/~oz/hash.html
+     *        TODO: Need to check implementtaion.
+    */
+    dcvm_size_t operator()(const DCVMStringView_t &str) const
+    {
+        auto pStr = str.data();
+
+        dcvm_size_t hash = 5381;
+        int c = 0;
+
+        while (c = *pStr++)
+            hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+        return hash;
+    }
+};
+
 template <typename Key, typename T>
 using DCVMUnorderedMap_t = eastl::unordered_map<Key, T, DCVMHash<Key>, eastl::equal_to<Key>, EASTLAllocator>;
 
@@ -77,6 +101,11 @@ using DCVMString_t = std::basic_string<
     dcvm_char_t
     , std::char_traits<dcvm_char_t>
     , STLAllocator<dcvm_char_t>
+>;
+
+using DCVMStringView_t = std::basic_string_view<
+    dcvm_char_t
+    , std::char_traits<dcvm_char_t>
 >;
 
 template <typename T>
@@ -105,6 +134,27 @@ struct DCVMHash<DCVMString_t> final
     dcvm_size_t operator()(const DCVMString_t &str) const
     {
         auto pStr = str.c_str();
+
+        dcvm_size_t hash = 5381;
+        int c = 0;
+
+        while (c = *pStr++)
+            hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+        return hash;
+    }
+};
+
+template <>
+struct DCVMHash<DCVMStringView_t> final
+{
+    /*!
+     * @brief Calculate a hash of string according to article http://www.cse.yorku.ca/~oz/hash.html
+     *        TODO: Need to check implementtaion.
+    */
+    dcvm_size_t operator()(const DCVMStringView_t &str) const
+    {
+        auto pStr = str.data();
 
         dcvm_size_t hash = 5381;
         int c = 0;

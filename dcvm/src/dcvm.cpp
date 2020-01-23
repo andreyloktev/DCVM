@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+
 #include <dcvm/dcvm.h>
 #include <dcvm/DCVMLogger.h>
 #include "base/DCVMTypes.hpp"
@@ -13,12 +17,13 @@ using CloudDiskManager_t = dcvm::clouddiskmanager::CloudDiskManager;
 namespace
 {
 
-inline dcvm_size_t SIZE_OF_DCVMSTRING(const base::DCVMString_t &str) noexcept
+template <class T>
+inline dcvm_size_t SIZE_OF_DCVMSTRING(const T &str) noexcept
 {
     return sizeof(dcvm_char_t) * str.length() + sizeof(dcvm_char_t);
 }
 
-dcvm_char_t* CopyDCVMString(const base::DCVMString_t &str) noexcept
+dcvm_char_t* CopyDCVMString(const base::DCVMStringView_t &str) noexcept
 {
     const auto STR_SIZE = SIZE_OF_DCVMSTRING(str);
 
@@ -28,7 +33,7 @@ dcvm_char_t* CopyDCVMString(const base::DCVMString_t &str) noexcept
         return pStr;
     }
 
-    base::SystemApi::MemoryCopy(pStr, STR_SIZE, str.c_str(), STR_SIZE - sizeof(dcvm_char_t));
+    base::SystemApi::MemoryCopy(pStr, STR_SIZE, str.data(), STR_SIZE - sizeof(dcvm_char_t));
 
     return pStr;
 }
@@ -59,13 +64,13 @@ DCVMPrintInfo   g_DCVMPrintInfo = nullptr;
 
 extern "C"
 {
-    void dcvm_InitLogger(DCVMPrintError pErrLogger, DCVMPrintInfo pInfoLogger) noexcept
+    void dcvm_InitLogger(DCVMPrintError pErrLogger, DCVMPrintInfo pInfoLogger)
     {
         g_DCVMPrintError = pErrLogger;
         g_DCVMPrintInfo = pInfoLogger;
     }
 
-    DCVM_ERROR dcvm_Init(DCVMSystemAPI systemApi, DCVM **ppDcvm, struct DCVMContext *pCtxt) noexcept
+    DCVM_ERROR dcvm_Init(DCVMSystemAPI systemApi, DCVM **ppDcvm, struct DCVMContext *pCtxt)
     {
         UNREFFERENCE_VARIABLE(pCtxt);
 
@@ -99,39 +104,35 @@ extern "C"
         delete pDcvm;
     }
 
-    DCVM_ERROR dcvm_ControlAddClient(DCVM *pDcvm, const DCVMCloudDiskAPI client, dcvm_char_t **ppClientId, struct DCVMContext *pCtxt) noexcept
+    DCVM_ERROR dcvm_ControlAddCloudProvider(struct DCVM *pDcvm, const DCVMCloudProviderAPI provider, dcvm_char_t **ppProviderId, struct DCVMContext *pCtxt)
     {
-        if ((nullptr == pDcvm) || (nullptr == ppClientId))
+        if ((nullptr == pDcvm) || (nullptr == ppProviderId))
         {
             DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
             return DCVM_ERR_BAD_PARAMS;
         }
 
-        dcvm::base::DCVMString_t clientId;
-        DCVM_ERROR err = pDcvm->cloudDiskManager.AddClient(client, clientId, pCtxt);
+        dcvm::base::DCVMStringView_t providerId;
+        DCVM_ERROR err = pDcvm->cloudDiskManager.AddCloudProvider(provider, providerId, pCtxt);
         if (DCVM_FAILED(err))
         {
             DCVM_ERROR_TRACE(err);
             return err;
         }
 
-        dcvm_size_t clientIdSize = clientId.length() * sizeof(dcvm_char_t) + sizeof(dcvm_char_t);
-
-        *ppClientId = static_cast<dcvm_char_t*>(dcvm::base::SystemApi::MemoryAllocate(clientIdSize, DCVM_TRUE));
-        if (nullptr == *ppClientId)
+        *ppProviderId = dcvm::CopyDCVMString(providerId);
+        if (nullptr == *ppProviderId)
         {
             DCVM_ERROR_TRACE(DCVM_ERR_INSUFFICIENT_RESOURCES);
             return DCVM_ERR_INSUFFICIENT_RESOURCES;
         }
 
-        dcvm::base::SystemApi::MemoryCopy(*ppClientId, clientIdSize, clientId.c_str(), clientId.length());
-
         return DCVM_ERR_SUCCESS;
     }
 
-    DCVM_ERROR dcvm_ControlGetClients(DCVM *pDcvm, dcvm_char_t **ppClients, dcvm_size_t *pAmountClients, struct DCVMContext *pCtxt) noexcept
+    DCVM_ERROR dcvm_ControlGetCloudProviders(struct DCVM *pDcvm, dcvm_char_t **ppProvidersIds, dcvm_size_t *pSize, struct DCVMContext *pCtxt)
     {
-        if ((nullptr == pDcvm) || (nullptr == ppClients) || (nullptr == pAmountClients))
+        if ((nullptr == pDcvm) || (nullptr == ppProvidersIds) || (nullptr == pSize))
         {
             DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
             return DCVM_ERR_BAD_PARAMS;
@@ -139,33 +140,31 @@ extern "C"
 
         // Copy clients.
 
-        auto CalculateBufferSizeForClientsList = [](const dcvm::base::DCVMVector_t<dcvm::base::DCVMString_t> &clients) noexcept
+        auto CalculateBufferSizeForClientsList = [](const dcvm::base::DCVMVector_t<dcvm::base::DCVMStringView_t> &providers) noexcept
         {
             dcvm_size_t bufferSize = 0;
 
-            for (const auto &client : clients)
+            for (const auto &provider : providers)
             {
-                bufferSize += dcvm::SIZE_OF_DCVMSTRING(client);
+                bufferSize += dcvm::SIZE_OF_DCVMSTRING(provider);
             }
 
             return bufferSize;
         };
 
-        const auto clients = pDcvm->cloudDiskManager.GetClients(pCtxt);
-
-        *pAmountClients = clients.size();
-
-        if (0 == *pAmountClients)
+        const auto providers = pDcvm->cloudDiskManager.GetCloudProviders(pCtxt);
+        if (providers.empty())
         {
-            *ppClients = nullptr;
+            *ppProvidersIds = nullptr;
+            *pSize = 0;
             return DCVM_ERR_SUCCESS;
         }
 
-        *ppClients = static_cast<dcvm_char_t*>(dcvm::base::SystemApi::MemoryAllocate(
-            CalculateBufferSizeForClientsList(clients), DCVM_TRUE
-        ));
+        const auto BUFFER_SIZE = CalculateBufferSizeForClientsList(providers);
 
-        if (nullptr == *ppClients)
+        auto *pBuffer = static_cast<dcvm_char_t*>(dcvm::base::SystemApi::MemoryAllocate(BUFFER_SIZE, DCVM_TRUE));
+
+        if (nullptr == pBuffer)
         {
             DCVM_ERROR_TRACE(DCVM_ERR_INSUFFICIENT_RESOURCES);
             return DCVM_ERR_INSUFFICIENT_RESOURCES;
@@ -174,83 +173,113 @@ extern "C"
         //There is not any out of range checking because of pBuffer has enougth size to contain all clients ids.
         dcvm_size_t index = 0;
 
-        for (const auto &client : clients)
+        for (const auto &provider : providers)
         {
-            dcvm::base::SystemApi::MemoryCopy(*ppClients + index, client.length() * sizeof(dcvm_char_t), client.c_str(), client.length() * sizeof(dcvm_char_t));
-            index += client.length() + sizeof(dcvm_char_t);
+            dcvm::base::SystemApi::MemoryCopy(pBuffer + index, provider.length() * sizeof(dcvm_char_t), provider.data(), provider.length() * sizeof(dcvm_char_t));
+            index += provider.length() + sizeof(dcvm_char_t);
         }
+
+        *ppProvidersIds = pBuffer;
+        *pSize = BUFFER_SIZE;
 
         return DCVM_ERR_SUCCESS;
     }
 
-    
-    DCVM_ERROR dcvm_ControlGetUnauthorizedClients(DCVM *pDcvm, DCVMClientOAuthUri **ppClients, dcvm_size_t *pAmountClients, struct DCVMContext *pCtxt) noexcept
+    DCVM_ERROR dcvm_ControlGetAuthorzationUri(struct DCVM *pDcvm, const dcvm_char_t *pProviderId, dcvm_char_t **ppUri, struct DCVMContext *pCtxt)
     {
-        if ((nullptr == pDcvm) || (nullptr == ppClients) || (nullptr == pAmountClients))
+        if ((nullptr == pDcvm) || (nullptr == pProviderId) || (nullptr == ppUri))
         {
             DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
             return DCVM_ERR_BAD_PARAMS;
         }
 
-        using Clients = dcvm::base::DCVMVector_t<dcvm::base::DCVMPair_t<dcvm::base::DCVMString_t, dcvm::base::DCVMString_t>>;
-
-        Clients clients;
-        DCVM_ERROR err = pDcvm->cloudDiskManager.GetUnauthorizedClients(clients, pCtxt);
+        dcvm::base::DCVMString_t uri;
+        auto err = pDcvm->cloudDiskManager.GetAuthorizationUri(pProviderId, uri, pCtxt);
         if (DCVM_FAILED(err))
         {
             DCVM_ERROR_TRACE(err);
             return err;
         }
 
-        *pAmountClients = clients.size();
-
-        if (0 == *pAmountClients)
-        {
-            *ppClients = nullptr;
-            return DCVM_ERR_SUCCESS;
-        }
-
-        *ppClients = static_cast<DCVMClientOAuthUri*>(dcvm::base::SystemApi::MemoryAllocate(sizeof(DCVMClientOAuthUri) * clients.size(), DCVM_TRUE));
-        if (nullptr == *ppClients)
+        *ppUri = dcvm::CopyDCVMString(uri.c_str());
+        if (nullptr == *ppUri)
         {
             DCVM_ERROR_TRACE(DCVM_ERR_INSUFFICIENT_RESOURCES);
             return DCVM_ERR_INSUFFICIENT_RESOURCES;
         }
 
-        for (Clients::size_type i = 0; i < clients.size(); i++)
-        {
-            ppClients[i]->pClientId = dcvm::CopyDCVMString(clients[i].first);
-            ppClients[i]->pUri = dcvm::CopyDCVMString(clients[i].second);
-        }
-
         return DCVM_ERR_SUCCESS;
     }
 
-    DCVM_ERROR dcvm_ControlAuthorizeClient(DCVM *pDcvm, const DCVMClientOAuthCode *pOAuthCode, struct DCVMContext *pCtxt)
+    DCVM_ERROR dcvm_ControlCreateCloudDisk(DCVM *pDcvm, const DCVMClientOAuthCode *pOAuthCode, dcvm_size_t *pCloudDiskId, struct DCVMContext *pCtxt)
     {
         if (
             (nullptr == pDcvm) 
             || (nullptr == pOAuthCode) 
-            || (nullptr == pOAuthCode->pClientId) 
+            || (nullptr == pOAuthCode->pProviderId) 
             || (nullptr == pOAuthCode->pOAuthCode)
+            || (nullptr == pCloudDiskId)
         )
         {
             DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
             return DCVM_ERR_BAD_PARAMS;
         }
 
-        return pDcvm->cloudDiskManager.AuthorizeClient(pOAuthCode->pClientId, pOAuthCode->pOAuthCode, pCtxt);
+        return pDcvm->cloudDiskManager.CreateCloudDisk(pOAuthCode->pProviderId, pOAuthCode->pOAuthCode, *pCloudDiskId, pCtxt);
     }
 
-    DCVM_ERROR dcvm_InitCloudDisk(
+    DCVM_ERROR dcvm_ControlGetCloudDisks(struct DCVM *pDcvm, dcvm_size_t **ppCloudDisksIds, dcvm_size_t *pAmountCloudDisksIds, struct DCVMContext *pCtxt)
+    {
+        if ((nullptr == pDcvm) || (nullptr == ppCloudDisksIds) || (nullptr == pAmountCloudDisksIds))
+        {
+            DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
+            return DCVM_ERR_BAD_PARAMS;
+        }
+
+        const auto ids = pDcvm->cloudDiskManager.GetCloudDisks(pCtxt);
+        if (ids.empty())
+        {
+            *ppCloudDisksIds = nullptr;
+            *pAmountCloudDisksIds = 0;
+            return DCVM_ERR_SUCCESS;
+        }
+
+        const dcvm_size_t BUFFER_SIZE = ids.size() * sizeof(dcvm_size_t);
+        dcvm_size_t *pBuffer = static_cast<dcvm_size_t*>(dcvm::base::SystemApi::MemoryAllocate(BUFFER_SIZE, DCVM_TRUE));
+        if (nullptr == pBuffer)
+        {
+            DCVM_ERROR_TRACE(DCVM_ERR_INSUFFICIENT_RESOURCES);
+            return DCVM_ERR_INSUFFICIENT_RESOURCES;
+        }
+
+        dcvm::base::SystemApi::MemoryCopy(pBuffer, BUFFER_SIZE, &ids[0], BUFFER_SIZE);
+
+        *ppCloudDisksIds = pBuffer;
+        *pAmountCloudDisksIds = ids.size();
+
+        return DCVM_ERR_SUCCESS;
+    }
+
+    DCVM_ERROR dcvm_ControlGetCloudDiskInformation(struct DCVM *pDcvm, const dcvm_size_t id, DCVMCloudDiskInfo *pInfo, dcvm_size_t *pSize, struct DCVMContext *pCtxt) 
+    {
+        if ((nullptr == pDcvm) || (nullptr == pSize))
+        {
+            DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
+            return DCVM_ERR_BAD_PARAMS;
+        }
+
+        return pDcvm->cloudDiskManager.GetCloudDiskInformation(id, pInfo, *pSize, pCtxt);
+    }
+
+    DCVM_ERROR dcvm_ControlInitCloudDisk(
         struct DCVM             *pDcvm
-        , const dcvm_char_t     *pClientId
+        , const dcvm_size_t     cloudDiskId
         , const dcvm_uint64_t   flags
         , struct DCVMCloudDisk  **ppCloudDisk
         , struct DCVMContext    *pCtxt
     )
     {
-        if ((nullptr == pDcvm) || (nullptr == pClientId) || (nullptr == ppCloudDisk))
+        if ((nullptr == pDcvm) || (nullptr == ppCloudDisk))
         {
             DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
             return DCVM_ERR_BAD_PARAMS;
@@ -259,7 +288,7 @@ extern "C"
         dcvm::clouddisk::objects::CloudDiskDirectory *pRootDir = nullptr;
         dcvm::clouddisk::ICloudDisk *pCloudDisk = nullptr;
 
-        DCVM_ERROR err = pDcvm->cloudDiskManager.InitCloudDisk(pClientId, flags, pRootDir, pCloudDisk, pCtxt);
+        DCVM_ERROR err = pDcvm->cloudDiskManager.InitCloudDisk(cloudDiskId, flags, pRootDir, pCloudDisk, pCtxt);
         if (DCVM_FAILED(err))
         {
             return err;
@@ -272,6 +301,7 @@ extern "C"
 
             pRootDir->DecReff(pCtxt);
             pCloudDisk->Unmount(pCtxt);
+            pCloudDisk->DecReff(pCtxt);
 
             return DCVM_ERR_INSUFFICIENT_RESOURCES;
         }
@@ -282,22 +312,22 @@ extern "C"
         return DCVM_ERR_SUCCESS;
     }
 
-    DCVM_ERROR dcvm_InitLogicalCloudDisk(
+    DCVM_ERROR dcvm_ControlInitLogicalCloudDisk(
         struct DCVM                 *pDcvm
-        , const dcvm_char_t* const  *ppClientIds
-        , const dcvm_size_t         amountClients
+        , const dcvm_size_t* const  pCloudDisksIds
+        , const dcvm_size_t         amountCloudDisksIds
         , const dcvm_size_t         flags
-        , DCVMCloudDisk             **ppCloudDisk
+        , struct DCVMCloudDisk      **ppCloudDisk
         , struct DCVMContext        *pCtxt
     )
     {
-        if ((nullptr == pDcvm) || ((nullptr == ppClientIds) && (0 != amountClients)) || (nullptr == ppCloudDisk))
+        if ((nullptr == pDcvm) || ((nullptr == pCloudDisksIds) && (0 != amountCloudDisksIds)) || (nullptr == ppCloudDisk))
         {
             DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
             return DCVM_ERR_BAD_PARAMS;
         }
 
-        if (0 == amountClients)
+        if (0 == amountCloudDisksIds)
         {
             *ppCloudDisk = nullptr;
             return DCVM_ERR_SUCCESS;
@@ -306,15 +336,16 @@ extern "C"
         dcvm::clouddisk::objects::CloudDiskDirectory *pRootDir = nullptr;
         dcvm::clouddisk::ICloudDisk *pCloudDisk = nullptr;
 
-        dcvm::base::DCVMVector_t<dcvm::base::DCVMString_t> clients;
-        for (int i = 0; i < amountClients; i++)
+        dcvm::base::DCVMVector_t<dcvm_size_t> cloudDisksIds;
+        for (int i = 0; i < amountCloudDisksIds; i++)
         {
-            clients.push_back(ppClientIds[i]);
+            cloudDisksIds.push_back(pCloudDisksIds[i]);
         }
 
-        DCVM_ERROR err = pDcvm->cloudDiskManager.InitCloudDisk(clients, flags, pRootDir, pCloudDisk, pCtxt);
+        DCVM_ERROR err = pDcvm->cloudDiskManager.InitCloudDisk(cloudDisksIds, flags, pRootDir, pCloudDisk, pCtxt);
         if (DCVM_FAILED(err))
         {
+            DCVM_ERROR_TRACE(err);
             return err;
         }
 
@@ -325,6 +356,7 @@ extern "C"
 
             pRootDir->DecReff(pCtxt);
             pCloudDisk->Unmount(pCtxt);
+            pCloudDisk->DecReff(pCtxt);
 
             return DCVM_ERR_INSUFFICIENT_RESOURCES;
         }
@@ -343,19 +375,13 @@ extern "C"
             return DCVM_ERR_BAD_PARAMS;
         }
 
-        auto cnt = pCloudDisk->pRootDir->DecReff(pCtxt);
-        if (cnt > 1)
-        {
-            DCVM_INFO_TRACE("Refference counter of the root directory is gteater than 1. Possible, close operation has not been called.");
-        }
-
         DCVM_ERROR err = pCloudDisk->pCloudDisk->Unmount(pCtxt);
         if (DCVM_FAILED(err))
         {
-            return err;
+            DCVM_INFO_TRACE("Unmount error code is 0x%x.", err);
         }
 
-        cnt = pCloudDisk->pCloudDisk->DecReff(pCtxt);
+        auto cnt = pCloudDisk->pCloudDisk->DecReff(pCtxt);
         if (cnt > 1)
         {
             DCVM_INFO_TRACE("Refference counter of the cloud disk instance is gteater than 1. Possible, DecReff operation has not been called.");
@@ -367,29 +393,13 @@ extern "C"
         return DCVM_ERR_SUCCESS;
     }
 
-    void dcvm_ReleaseString(dcvm_char_t *pStr) noexcept
+    void dcvm_ReleaseBuffer(void *pBuffer)
     {
-        if (nullptr == pStr)
+        if (nullptr == pBuffer)
         {
             return;
         }
 
-        dcvm::base::SystemApi::MemoryFree(pStr);
-    }
-
-    void dcvm_ReleaseDCVMClientOAuthUriArray(DCVMClientOAuthUri *pClients, const dcvm_size_t size) noexcept
-    {
-        if (nullptr == pClients)
-        {
-            return;
-        }
-
-        for (dcvm_size_t i = 0; i < size; i++)
-        {
-            dcvm::base::SystemApi::MemoryFree(pClients[i].pClientId);
-            dcvm::base::SystemApi::MemoryFree(pClients[i].pUri);
-        }
-
-        dcvm::base::SystemApi::MemoryFree(pClients);
+        dcvm::base::SystemApi::MemoryFree(pBuffer);
     }
 }

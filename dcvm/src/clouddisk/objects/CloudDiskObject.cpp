@@ -1,11 +1,14 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "CloudDiskObject.hpp"
 
 namespace dcvm      {
 namespace clouddisk {
 namespace objects   {
 
-CloudDiskObject::CloudDiskObject(const DCVMFileInfo &fileInfo, ICloudDisk *pCloudDisk) noexcept 
-    : m_pCloudDisk(pCloudDisk), m_fileInfo(fileInfo), m_reffCnt(1)
+CloudDiskObject::CloudDiskObject(const DCVMFileInfo &fileInfo, struct DCVMHandle *pCloudFileObject, ICloudDisk *pCloudDisk) noexcept 
+    : m_pCloudDisk(pCloudDisk), m_pCloudFileObject(pCloudFileObject), m_fileInfo(fileInfo), m_reffCnt(1)
 {
 }
 

@@ -5,7 +5,7 @@
 #include "../base/DCVMTypes.hpp"
 #include "../base/MemoryBase.hpp"
 #include "../base/ICloudDiskUnknown.hpp"
-#include <dcvm/DCVMCloudDiskAPI.h>
+#include <dcvm/DCVMCloudProviderAPI.h>
 #include "objects/CloudDiskDirectory.hpp"
 #include "objects/CloudDiskFile.hpp"
 
@@ -41,9 +41,8 @@ public:
      * @return Error code.
     */
     virtual DCVM_ERROR LogInWithOAuthCode(
-        const base::DCVMString_t    &code
-        , base::DCVMString_t        &refreshToken
-        , struct DCVMContext        *pCtxt
+        const base::DCVMStringView_t    &code
+        , struct DCVMContext            *pCtxt
     ) noexcept = 0;
 
     /*!
@@ -54,9 +53,8 @@ public:
      * @return Error code.
     */
     virtual DCVM_ERROR LogInWithRefreshToken(
-        const base::DCVMString_t    refreshToken
-        , base::DCVMString_t        &newRefreshToken
-        , struct DCVMContext        *pCtxt
+        const base::DCVMStringView_t    refreshToken
+        , struct DCVMContext            *pCtxt
     ) noexcept = 0;
 
     /*!
@@ -88,12 +86,14 @@ public:
 
     /*!
      * Get information about a cloud disk.
-     * @param [in] di disk information.
+     * @param [in,out] pDiskInfo pointer to the buffer that recieves information about cloud disk.
+     * @param [in, out] size size of disk information buffer. If pDiskInfo is nullptr then size recieves necessary size of pDiskInfo.
      * @param [in] pCtxt system context(optional).
      * @return Error code.
     */
     virtual DCVM_ERROR CloudGetDiskInfo(
-        DCVMCloudDiskInfo       &di
+        DCVMCloudDiskInfo       *pDiskInfo
+        , dcvm_size_t           &size
         , struct DCVMContext    *pCtxt
     ) const noexcept = 0;
 
@@ -104,6 +104,8 @@ public:
     */
     virtual DCVM_ERROR Flush(struct DCVMContext *pCtxt) const noexcept = 0;
 protected:
+    virtual ~ICloudDisk() noexcept = 0 {};
+    
     /*!
      * @brief Create a file.
      * @param [in] fileName full specified file name (file path + file name).
@@ -113,10 +115,10 @@ protected:
      * @return Error code.
     */
     virtual DCVM_ERROR CloudCreateFile(
-        const base::DCVMString_t    &fileName
-        , const DCVMFileInfo        &fi
-        , objects::CloudDiskFile*   &pFile
-        , struct DCVMContext        *pCtxt
+        const base::DCVMStringView_t    &fileName
+        , const DCVMFileInfo            &fi
+        , objects::CloudDiskFile*       &pFile
+        , struct DCVMContext            *pCtxt
     ) noexcept = 0;
 
     /*!
@@ -127,9 +129,9 @@ protected:
      * @return Error code.
     */
     virtual DCVM_ERROR CloudCreateDirectory(
-        const base::DCVMString_t    &dirName
-        , objects::CloudDiskFile*   &pDir
-        , struct DCVMContext        *pCtxt
+        const base::DCVMStringView_t    &dirName
+        , objects::CloudDiskFile*       &pDir
+        , struct DCVMContext            *pCtxt
     ) noexcept = 0;
 
     /*!
@@ -140,9 +142,9 @@ protected:
      * @return Error code.
     */
     virtual DCVM_ERROR CloudOpenFile(
-        const base::DCVMString_t    &fileName
-        , objects::CloudDiskFile*   &pFile
-        , struct DCVMContext        *pCtxt
+        const base::DCVMStringView_t    &fileName
+        , objects::CloudDiskFile*       &pFile
+        , struct DCVMContext            *pCtxt
     ) noexcept = 0;
 
     /*!
@@ -197,8 +199,8 @@ protected:
      * @return Error code.
     */
     virtual DCVM_ERROR CloudUnlinkFile(
-        const base::DCVMString_t    &fileName
-        , struct DCVMContext        *pCtxt
+        const base::DCVMStringView_t    &fileName
+        , struct DCVMContext            *pCtxt
     ) const noexcept = 0;
 
     /*!
@@ -212,11 +214,11 @@ protected:
      * 
     */
     virtual DCVM_ERROR CloudReadDirectory(
-        const base::DCVMString_t    &dirName
-        , DCVMFileInfo              *pFIBuffer
-        , const dcvm_uint32_t       fiCnt
-        , dcvm_uint32_t             &index
-        , struct DCVMContext        *pCtxt
+        const base::DCVMStringView_t    &dirName
+        , DCVMFileInfo                  *pFiBuffer
+        , const dcvm_uint32_t           fiCnt
+        , dcvm_uint32_t                 &index
+        , struct DCVMContext            *pCtxt
     ) const noexcept = 0;
 
     /*!
@@ -230,13 +232,13 @@ protected:
      * @return Error code.
     */
     virtual DCVM_ERROR CloudMoveFile(
-        objects::CloudDiskDirectory     *pSrcDir
-        , const base::DCVMString_t      &srcFileName
-        , objects::CloudDiskFile        *pFile
-        , const base::DCVMString_t      &dstFileName
-        , objects::CloudDiskDirectory   *pDstDir
-        , dcvm_bool_t                   bReplace
-        , struct DCVMContext            *pCtxt
+        objects::CloudDiskDirectory         *pSrcDir
+        , const base::DCVMStringView_t      &srcFileName
+        , objects::CloudDiskFile            *pFile
+        , const base::DCVMStringView_t      &dstFileName
+        , objects::CloudDiskDirectory       *pDstDir
+        , dcvm_bool_t                       bReplace
+        , struct DCVMContext                *pCtxt
     ) noexcept = 0;
 };
 
