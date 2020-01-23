@@ -1,3 +1,5 @@
 .build
 .vscode
 .vs
+*.vpp.vbak
+*.vpp.bak_*
