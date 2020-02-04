@@ -6,6 +6,6 @@ set(projectName
 set(components
     eastl
     dcvm
-    dcvm_filemanager_cli
-    system
+    filemanager_cli
+    dcvm_windows
 )

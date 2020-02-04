@@ -27,6 +27,7 @@ enum DCVM_ERROR
     , DCVM_ERR_CLOUDDISK_HAS_BEEN_ALREADY_AUTHENTICATED     = 0xa
     , DCVM_ERR_CLOUDDISK_IS_NOT_AUTHORIZED                  = MAKE_DCVM_ERROR(0xb)
     , DCVM_ERR_FILE_IS_NOT_DIRECTORY                        = MAKE_DCVM_ERROR(0xc)
+    , DCVM_ERR_CANNOT_SEND_REQUEST                          = MAKE_DCVM_ERROR(0xd)
 };
 
 const char* DCVMErrorToString(enum DCVM_ERROR err);

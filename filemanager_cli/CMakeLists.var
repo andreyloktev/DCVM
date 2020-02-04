@@ -1,22 +1,24 @@
 
 # Module name (REQUIRED)
-set(module_name dcvm)
+set(module_name filemanager_cli)
 
 # Module type(library or executable. Default is library)
 set(module_type library)
 
 # Public module headers
 set(module_public_headers
-    include/dcvm_cpp/dcvm.hpp
 )
 
 # Private module headers
 set(module_private_headers
+    src/dcvm_wrapper/DCVMWrapper.hpp
+    src/DCVMTypes.hpp
 )
 
 # Module sources
 set(module_sources
-    src/dcvm.cpp
+    src/dcvm_wrapper/DCVMWrapper.cpp
+    src/main.cpp
 )
 
 # Module defines
@@ -31,6 +33,20 @@ set(module_tests
 set(module_dependency
     dcvm
 )
+
+# Append platform specific libraries.
+if(WIN32)
+    list(APPEND module_dependency
+        dcvm_windows
+    )
+elseif(APPLE)
+    list(APPEND module_dependency
+         iconv
+    )
+elseif(UNIX)
+    list(APPEND module_dependency
+    )
+endif()
 
 # Module external dependency(get via vcpkg)
 set(module_external_dependency

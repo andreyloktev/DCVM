@@ -64,19 +64,19 @@ extern "C"
     }
 
     DCVM_ERROR DCVMSendHttpRequest_test(
-        const dcvm_char_t       *pMethod
-        , const dcvm_char_t     *pUri
-        , const DCVMNameValue   *pHeaders
-        , dcvm_size_t           amountHeaders
-        , const dcvm_uint8_t    *pBody
-        , dcvm_size_t           bodySize
-        , dcvm_uint32_t         *pResponseCode
-        , dcvm_uint8_t          **ppResponse
-        , dcvm_size_t           *pResponseSize
-        , struct DCVMContext    *pCtxt
+        const enum DCVMHttpMethod   method
+        , const dcvm_char_t         *pUri
+        , const DCVMNameValue       *pHeaders
+        , dcvm_size_t               amountHeaders
+        , const dcvm_uint8_t        *pBody
+        , dcvm_size_t               bodySize
+        , dcvm_uint32_t             *pResponseCode
+        , dcvm_uint8_t              **ppResponse
+        , dcvm_size_t               *pResponseSize
+        , struct DCVMContext        *pCtxt
     ) noexcept
     {
-        DCVM_UNREFERENCED_PARAMETER(pMethod);
+        DCVM_UNREFERENCED_PARAMETER(method);
         DCVM_UNREFERENCED_PARAMETER(pUri);
         DCVM_UNREFERENCED_PARAMETER(pHeaders);
         DCVM_UNREFERENCED_PARAMETER(amountHeaders);

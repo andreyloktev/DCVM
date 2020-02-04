@@ -32,7 +32,7 @@ struct SystemApi final
         g_systemApi.MemoryCopy ? g_systemApi.MemoryCopy(pDst, dstSize, pSrc, srcSize) : void();
     }
 
-    static dcvm_int32_t MemoryCompare(void *pBlock1, const void *pBlock2, dcvm_size_t bytesToCmp) noexcept
+    static dcvm_int32_t MemoryCompare(const void *pBlock1, const void *pBlock2, dcvm_size_t bytesToCmp) noexcept
     {
         return g_systemApi.MemoryCompare ? g_systemApi.MemoryCompare(pBlock1, pBlock2, bytesToCmp) : -1;
     }

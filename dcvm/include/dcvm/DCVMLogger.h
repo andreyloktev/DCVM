@@ -2,6 +2,7 @@
 #define DCVM_DCVM_DCVMLOGGER_H_
 
 #include "DCVMError.h"
+#include "DCVMTypes.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,7 +20,7 @@ typedef void (*DCVMPrintError)(enum DCVM_ERROR err, const char *pSrcFile, unsign
  * Pring debug information.
  * @param pFmt message(format string)
 */
-typedef void (*DCVMPrintInfo)(const char *pFmt, ...);
+typedef void (*DCVMPrintInfo)(const dcvm_char_t *pFmt, ...);
 
 /*!
  * Initialize or reinitialize logger.
@@ -50,7 +51,7 @@ do                                                      \
 {                                                       \
     if (g_DCVMPrintInfo)                                \
     {                                                   \
-        g_DCVMPrintInfo((Format), ##__VA_ARGS__);       \
+        g_DCVMPrintInfo(DCVM_TEXT((Format)), ##__VA_ARGS__);       \
     }                                                   \
 }                                                       \
 while (0);

@@ -19,16 +19,16 @@ extern "C"
     void DCVMMemorySet_test(void *pBlock, dcvm_size_t size, dcvm_uint8_t value);
 
     DCVM_ERROR DCVMSendHttpRequest_test(
-        const dcvm_char_t       *pMethod
-        , const dcvm_char_t     *pUri
-        , const DCVMNameValue   *pHeaders
-        , dcvm_size_t           amountHeaders
-        , const dcvm_uint8_t    *pBody
-        , dcvm_size_t           bodySize
-        , dcvm_uint32_t         *pResponseCode
-        , dcvm_uint8_t          **ppResponse
-        , dcvm_size_t           *pResponseSize
-        , struct DCVMContext    *pCtxt
+        const enum DCVMHttpMethod   method
+        , const dcvm_char_t         *pUri
+        , const DCVMNameValue       *pHeaders
+        , dcvm_size_t               amountHeaders
+        , const dcvm_uint8_t        *pBody
+        , dcvm_size_t               bodySize
+        , dcvm_uint32_t             *pResponseCode
+        , dcvm_uint8_t              **ppResponse
+        , dcvm_size_t               *pResponseSize
+        , struct DCVMContext        *pCtxt
     );
 }
 

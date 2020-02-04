@@ -30,6 +30,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
     CACHE PATH "Directory where .so files are dumped.")
 
+set(ROOT .)
+
 
 project(${projectName})
 

@@ -1,21 +1,18 @@
 
 # Module name (REQUIRED)
-set(module_name test)
+set(module_name dcvm_windows)
 
 # Module type(library or executable. Default is library)
-set(module_type executable)
+set(module_type library)
 
 # Public module headers
 set(module_public_headers
-)
-
-# Private module headers
-set(module_private_headers
+    include/system/dcvm_windows.h
 )
 
 # Module sources
 set(module_sources
-    src/main.cpp
+    src/dcvm_windows.cpp
 )
 
 # Module defines
@@ -34,5 +31,4 @@ set(module_dependency
 # Module external dependency(get via vcpkg)
 set(module_external_dependency
     cpprestsdk_cpprest
-    OpenSSL_SSL_Crypto
 )

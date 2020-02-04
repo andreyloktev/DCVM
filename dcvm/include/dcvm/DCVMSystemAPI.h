@@ -10,6 +10,21 @@ typedef struct _DCVMNameValue
     const dcvm_char_t *pValue;
 } DCVMNameValue;
 
+enum DCVMHttpMethod
+{
+    DCVM_NONE
+    , DCVM_GET
+    , DCVM_POST
+    , DCVM_PUT
+    , DCVM_DEL
+    , DCVM_HEAD
+    , DCVM_OPTIONS
+    , DCVM_TRCE
+    , DCVM_CONNECT
+    , DCVM_MERGE
+    , DCVM_PATCH
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -44,7 +59,7 @@ typedef void (*DCVMMemoryCopy)(void *pDst, dcvm_size_t dstSize,  const void *pSr
  * @param [in] bytesToCmp amount bytes to compare.
  * @return result of compare.
 */
-typedef dcvm_int32_t (*DCVMMemoryCompare)(void *pBlock1, const void *pBlock2, dcvm_size_t bytesToCmp);
+typedef dcvm_int32_t (*DCVMMemoryCompare)(const void *pBlock1, const void *pBlock2, dcvm_size_t bytesToCmp);
 
 /*!
  * @brief Sets the first 'size' bytes of the block of memory pointed by pBlock to the specified value.
@@ -55,6 +70,7 @@ typedef dcvm_int32_t (*DCVMMemoryCompare)(void *pBlock1, const void *pBlock2, dc
 typedef void (*DCVMMemorySet)(void *pBlock, dcvm_size_t size, dcvm_uint8_t value);
 
 /*!
+ * TODO: Need to interact with this function via http context.
  * @brief Send http request and get response.
  * @param [in] pMethod http request method.
  * @param [in] pUri operation
@@ -68,16 +84,16 @@ typedef void (*DCVMMemorySet)(void *pBlock, dcvm_size_t size, dcvm_uint8_t value
  * @param [in] pCtxt system context(optional).
 */
 typedef enum DCVM_ERROR (*DCVMSendHttpRequest)(
-    const dcvm_char_t       *pMethod
-    , const dcvm_char_t     *pUri
-    , const DCVMNameValue   *pHeaders
-    , dcvm_size_t           amountHeaders
-    , const dcvm_uint8_t    *pBody
-    , dcvm_size_t           bodySize
-    , dcvm_uint32_t         *pResponseCode
-    , dcvm_uint8_t          **ppResponse
-    , dcvm_size_t           *pResponseSize
-    , struct DCVMContext    *pCtxt
+    const enum DCVMHttpMethod   method
+    , const dcvm_char_t         *pUri
+    , const DCVMNameValue       *pHeaders
+    , dcvm_size_t               amountHeaders
+    , const dcvm_uint8_t        *pBody
+    , dcvm_size_t               bodySize
+    , dcvm_uint32_t             *pResponseCode
+    , dcvm_uint8_t              **ppResponse
+    , dcvm_size_t               *pResponseSize
+    , struct DCVMContext        *pCtxt
 );
 
 #ifdef __cplusplus
