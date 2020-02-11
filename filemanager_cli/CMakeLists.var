@@ -3,7 +3,7 @@
 set(module_name filemanager_cli)
 
 # Module type(library or executable. Default is library)
-set(module_type library)
+set(module_type executable)
 
 # Public module headers
 set(module_public_headers

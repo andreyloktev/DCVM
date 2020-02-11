@@ -43,7 +43,7 @@ inline web::http::method ToCppRestMethod(DCVMHttpMethod method) noexcept
 
 extern "C" {
 
-void* win_DCVMMemoryAlloc(dcvm_size_t size, dcvm_bool_t bZero)
+void* sys_DCVMMemoryAlloc(dcvm_size_t size, dcvm_bool_t bZero)
 {
     void *pBuf = ::malloc(size);
     if (bZero && pBuf)
@@ -54,7 +54,7 @@ void* win_DCVMMemoryAlloc(dcvm_size_t size, dcvm_bool_t bZero)
     return pBuf;
 }
 
-void win_DCVMMemoryFree(void *pBlock)
+void sys_DCVMMemoryFree(void *pBlock)
 {
     if (pBlock)
     {
@@ -62,7 +62,7 @@ void win_DCVMMemoryFree(void *pBlock)
     }
 }
 
-void win_DCVMMemoryCopy(void *pDst, dcvm_size_t dstSize,  const void *pSrc, dcvm_size_t srcSize)
+void sys_DCVMMemoryCopy(void *pDst, dcvm_size_t dstSize,  const void *pSrc, dcvm_size_t srcSize)
 {
     if ((nullptr == pDst) || (nullptr == pSrc) || (0 == dstSize) || (0 == srcSize))
     {
@@ -72,12 +72,12 @@ void win_DCVMMemoryCopy(void *pDst, dcvm_size_t dstSize,  const void *pSrc, dcvm
     ::memcpy_s(pDst, dstSize, pSrc, srcSize);
 }
 
-dcvm_int32_t win_DCVMMemoryCompare(const void *pBlock1, const void *pBlock2, dcvm_size_t bytesToCmp)
+dcvm_int32_t sys_DCVMMemoryCompare(const void *pBlock1, const void *pBlock2, dcvm_size_t bytesToCmp)
 {
     return ::memcmp(pBlock1, pBlock2, bytesToCmp);
 }
 
-void win_DCVMMemorySet(void *pBlock, dcvm_size_t size, dcvm_uint8_t value)
+void sys_DCVMMemorySet(void *pBlock, dcvm_size_t size, dcvm_uint8_t value)
 {
     if ((nullptr == pBlock) || (0 == size))
     {
@@ -87,7 +87,7 @@ void win_DCVMMemorySet(void *pBlock, dcvm_size_t size, dcvm_uint8_t value)
     ::memset(pBlock, value, size);
 }
 
-enum DCVM_ERROR win_DCVMSendHttpRequest(
+enum DCVM_ERROR sys_DCVMSendHttpRequest(
     const enum DCVMHttpMethod   method
     , const dcvm_char_t         *pUri
     , const DCVMNameValue       *pHeaders
@@ -131,28 +131,25 @@ enum DCVM_ERROR win_DCVMSendHttpRequest(
 
         web::http::client::http_client client(pUri);
 
+        // TODO: need to implement Concurensy::streams::streambuffer to write into ppResponse
         return client.request(msg)
-            .then([=](web::http::http_response &response) -> DCVM_ERROR
+            .then([=](web::http::http_response &response)
             {
                 *pResponseCode = response.status_code();
-
-                if (nullptr != ppResponse)
+                return response.extract_vector();
+            })
+            .then([=](std::vector<unsigned char> body)
+            {
+                if (nullptr != ppResponse && !body.empty())
                 {
-                    if (response.headers().has(U("Content-Length")))
+                    *pResponseSize = body.size();
+                    *ppResponse = static_cast<dcvm_uint8_t*>(sys_DCVMMemoryAlloc(*pResponseSize, DCVM_FALSE));
+                    if (nullptr == *ppResponse)
                     {
-                        *pResponseSize = std::stoul(response.headers()[U("Content-Length")]);
-                        if (0 != *pResponseSize)
-                        {
-                            *ppResponse = static_cast<dcvm_uint8_t*>(win_DCVMMemoryAlloc(*pResponseSize, DCVM_FALSE));
-                            if (nullptr == *ppResponse)
-                            {
-                                DCVM_ERROR_TRACE(DCVM_ERR_INSUFFICIENT_RESOURCES);
-                                return DCVM_ERR_INSUFFICIENT_RESOURCES;
-                            }
-
-                            //Concurrency::streams::streambuf<dcvm_uint8_t>(
-                        }
+                        return DCVM_ERR_INSUFFICIENT_RESOURCES;
                     }
+
+                    sys_DCVMMemoryCopy(*ppResponse, *pResponseSize, &body[0], *pResponseSize);
                 }
 
                 return DCVM_ERR_SUCCESS;

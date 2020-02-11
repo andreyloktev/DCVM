@@ -106,7 +106,7 @@ extern "C"
 
     DCVM_ERROR dcvm_ControlAddCloudProvider(struct DCVM *pDcvm, const DCVMCloudProviderAPI provider, dcvm_char_t **ppProviderId, struct DCVMContext *pCtxt)
     {
-        if ((nullptr == pDcvm) || (nullptr == ppProviderId))
+        if (nullptr == pDcvm)
         {
             DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
             return DCVM_ERR_BAD_PARAMS;
@@ -120,11 +120,14 @@ extern "C"
             return err;
         }
 
-        *ppProviderId = dcvm::CopyDCVMString(providerId);
-        if (nullptr == *ppProviderId)
+        if (nullptr != ppProviderId)
         {
-            DCVM_ERROR_TRACE(DCVM_ERR_INSUFFICIENT_RESOURCES);
-            return DCVM_ERR_INSUFFICIENT_RESOURCES;
+            *ppProviderId = dcvm::CopyDCVMString(providerId);
+            if (nullptr == *ppProviderId)
+            {
+                DCVM_ERROR_TRACE(DCVM_ERR_INSUFFICIENT_RESOURCES);
+                return DCVM_ERR_INSUFFICIENT_RESOURCES;
+            }
         }
 
         return DCVM_ERR_SUCCESS;

@@ -3,8 +3,9 @@
 
 #include <dcvm/DCVMError.h>
 #include "../DCVMTypes.hpp"
+#include <dcvm/DCVMCloudProviderAPI.h>
 
-namespace dcvm_cpp {
+namespace dcvm_filemanager_cli {
 
 struct DCVMCloudDiskInfo final
 {
@@ -28,6 +29,8 @@ public:
      * @brief Destructor.
     */
     ~DCVMWrapper() noexcept;
+
+    DCVM_ERROR ControlGetListOfCloudProviders(std::vector<DCVMString_t> &providersIds) const noexcept;
     
     DCVM_ERROR ControlGetAuthorzationUri(const DCVMStringView_t &providerId, DCVMString_t &uri) const noexcept;
 
@@ -36,6 +39,8 @@ public:
         , const DCVMStringView_t    &oauthCode
         , dcvm_size_t               &cloudDiskId
     ) const noexcept;
+
+    DCVM_ERROR ControlGetListOfCloudDiskIds(std::vector<dcvm_size_t> &ids) const noexcept;
 
     DCVM_ERROR ControlGetCloudDiskInformation(const dcvm_size_t cloudDiskId, DCVMCloudDiskInfo &info) const noexcept;
 private:
