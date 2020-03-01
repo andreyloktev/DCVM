@@ -174,9 +174,8 @@ DCVM_ERROR DCVMWrapper::ControlGetListOfCloudProviders(std::vector<DCVMString_t>
             providersIds.emplace_back(*dcvmBufIt);
         }
     }
-    catch (std::exception &e)
+    catch (std::exception&)
     {
-        DCVM_INFO_TRACE(e.what());
         return DCVM_ERR_INTERNAL;
     }
 
@@ -209,9 +208,8 @@ DCVM_ERROR DCVMWrapper::ControlGetAuthorzationUri(const DCVMStringView_t &provid
         std::unique_ptr<dcvm_char_t> pUri(pBuffer);
         uri = pUri.get();
     }
-    catch (std::exception &e)
+    catch (std::exception&)
     {
-        DCVM_INFO_TRACE(e.what());
         return DCVM_ERR_INTERNAL;
     }
 
@@ -268,9 +266,8 @@ DCVM_ERROR DCVMWrapper::ControlGetListOfCloudDiskIds(std::vector<dcvm_size_t> &i
     {
         ids = std::vector<dcvm_size_t>(pIds.get(), pIds.get() + amountIds);
     }
-    catch (std::exception &e)
+    catch (std::exception&)
     {
-        DCVM_INFO_TRACE(e.what());
         return DCVM_ERR_INTERNAL;
     }
 

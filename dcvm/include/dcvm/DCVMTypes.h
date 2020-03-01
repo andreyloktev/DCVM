@@ -3,7 +3,7 @@
 
 #ifdef _WIN32
 typedef wchar_t dcvm_char_t;
-#define DCVM_TEXT(text) L#text
+#define DCVM_TEXT(text) L##text
 #else
 typedef char dcvm_char_t;
 #define DCVM_TEXT(text) #text

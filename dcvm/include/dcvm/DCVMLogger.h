@@ -36,24 +36,24 @@ void dcvm_InitLogger(DCVMPrintError pErrLogger, DCVMPrintInfo pInfoLogger);
 extern DCVMPrintError   g_DCVMPrintError;
 extern DCVMPrintInfo    g_DCVMPrintInfo;
 
-#define DCVM_ERROR_TRACE(err)                           \
-do                                                      \
-{                                                       \
-    if (g_DCVMPrintError)                               \
-    {                                                   \
-        g_DCVMPrintError((err), __FILE__, __LINE__);    \
-    }                                                   \
-}                                                       \
+#define DCVM_ERROR_TRACE(err)                               \
+do                                                          \
+{                                                           \
+    if (g_DCVMPrintError)                                   \
+    {                                                       \
+        g_DCVMPrintError((err), __FILE__, __LINE__);        \
+    }                                                       \
+}                                                           \
 while (0);
 
-#define DCVM_INFO_TRACE(Format, ...)                    \
-do                                                      \
-{                                                       \
-    if (g_DCVMPrintInfo)                                \
-    {                                                   \
-        g_DCVMPrintInfo(DCVM_TEXT((Format)), ##__VA_ARGS__);       \
-    }                                                   \
-}                                                       \
+#define DCVM_INFO_TRACE(Format, ...)                        \
+do                                                          \
+{                                                           \
+    if (g_DCVMPrintInfo)                                    \
+    {                                                       \
+        g_DCVMPrintInfo(DCVM_TEXT(Format), ##__VA_ARGS__);\
+    }                                                       \
+}                                                           \
 while (0);
 
 #endif

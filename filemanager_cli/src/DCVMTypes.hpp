@@ -6,6 +6,7 @@
 #include <string_view>
 #include <vector>
 #include <memory>
+#include <iostream>
 
 namespace dcvm_filemanager_cli {
 

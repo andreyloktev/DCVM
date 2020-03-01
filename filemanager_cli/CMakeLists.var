@@ -13,10 +13,30 @@ set(module_public_headers
 set(module_private_headers
     src/dcvm_wrapper/DCVMWrapper.hpp
     src/DCVMTypes.hpp
+    src/dcvm_filemanager/tasks/DCVMTask.hpp
+    src/dcvm_filemanager/tasks/DCVMHelpTask.hpp
+    src/dcvm_filemanager/tasks/control/DCVMControlTask.hpp
+    src/dcvm_filemanager/tasks/control/DCVMDiskInfoTask.hpp
+    src/dcvm_filemanager/tasks/control/DCVMDiskListTask.hpp
+    src/dcvm_filemanager/tasks/control/DCVMDiskTask.hpp
+    src/dcvm_filemanager/tasks/control/DCVMProviderAuthTask.hpp
+    src/dcvm_filemanager/tasks/control/DCVMProviderListTask.hpp
+    src/dcvm_filemanager/tasks/control/DCVMProviderTask.hpp
+    src/dcvm_filemanager/tasks/control/DCVMProviderUriTask.hpp
 )
 
 # Module sources
 set(module_sources
+    src/dcvm_filemanager/tasks/DCVMTask.cpp
+    src/dcvm_filemanager/tasks/DCVMHelpTask.cpp
+    src/dcvm_filemanager/tasks/control/DCVMControlTask.cpp
+    src/dcvm_filemanager/tasks/control/DCVMDiskInfoTask.cpp
+    src/dcvm_filemanager/tasks/control/DCVMDiskListTask.cpp
+    src/dcvm_filemanager/tasks/control/DCVMDiskTask.cpp
+    src/dcvm_filemanager/tasks/control/DCVMProviderAuthTask.cpp
+    src/dcvm_filemanager/tasks/control/DCVMProviderListTask.cpp
+    src/dcvm_filemanager/tasks/control/DCVMProviderTask.cpp
+    src/dcvm_filemanager/tasks/control/DCVMProviderUriTask.cpp
     src/dcvm_wrapper/DCVMWrapper.cpp
     src/main.cpp
 )
