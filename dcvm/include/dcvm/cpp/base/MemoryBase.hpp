@@ -6,7 +6,6 @@
 namespace dcvm {
 namespace base {
 
-
 struct MemoryBase
 {
     MemoryBase() noexcept = default;
@@ -16,7 +15,7 @@ struct MemoryBase
 
     static void* operator new(dcvm_size_t size) noexcept
     {
-        return SystemApi::MemoryAllocate(static_cast<unsigned long>(size), DCVM_TRUE);
+        return SystemApi::MemoryAllocate<void>(static_cast<unsigned long>(size), DCVM_TRUE);
     }
 
     static void operator delete(void *pBuffer) noexcept
@@ -29,7 +28,7 @@ struct MemoryBase
 
     static void* operator new[](dcvm_size_t size) noexcept
     {
-        return SystemApi::MemoryAllocate(static_cast<unsigned long>(size), DCVM_TRUE);
+        return SystemApi::MemoryAllocate<void>(static_cast<unsigned long>(size), DCVM_TRUE);
     }
 
     static void operator delete[](void *pBuffer) noexcept

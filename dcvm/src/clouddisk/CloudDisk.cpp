@@ -2,7 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include <dcvm/DCVMLogger.h>
-#include "../base/SystemApi.hpp"
+#include <dcvm/cpp/base/SystemApi.hpp>
 #include "CloudDisk.hpp"
 
 namespace dcvm      {

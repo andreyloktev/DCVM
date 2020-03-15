@@ -6,6 +6,8 @@ set(projectName
 set(components
     eastl
     dcvm
+    dcvm_provider
+    dcvm_google
     filemanager_cli
 )
 

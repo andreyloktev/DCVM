@@ -58,19 +58,19 @@ PTask DCVMTask::Generate(Command &cmd) const
     return nullptr;
 }
 
-void DCVMTask::PrintError(const DCVMString_t&) const
+void DCVMTask::PrintError(const dcvm::base::DCVMString_t&) const
 {
     // Nothing to do
 }
 
-DCVMString_t DCVMTask::GetFirstCommand(Command &cmd)
+dcvm::base::DCVMString_t DCVMTask::GetFirstCommand(Command &cmd)
 {
     if (cmd.empty())
     {
-        return DCVMString_t();
+        return dcvm::base::DCVMString_t();
     }
 
-    DCVMString_t licenseCmd = cmd[0];
+    dcvm::base::DCVMString_t licenseCmd = cmd[0];
     cmd.erase(cmd.begin());
 
     std::transform(licenseCmd.begin(), licenseCmd.end(), licenseCmd.begin(), ToLower<dcvm_char_t>);

@@ -1,7 +1,7 @@
 #ifndef DCVM_CLOUDDSIK_OBJECTS_CLOUDDISKDIRECTORY_HPP_
 #define DCVM_CLOUDDSIK_OBJECTS_CLOUDDISKDIRECTORY_HPP_
 
-#include "../../base/DCVMTypes.hpp"
+#include <dcvm/cpp/base/DCVMTypes.hpp>
 #include "CloudDiskObject.hpp"
 #include "CloudDiskFile.hpp"
 

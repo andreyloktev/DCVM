@@ -12,7 +12,6 @@ set(module_public_headers
 # Private module headers
 set(module_private_headers
     src/dcvm_wrapper/DCVMWrapper.hpp
-    src/DCVMTypes.hpp
     src/dcvm_filemanager/tasks/DCVMTask.hpp
     src/dcvm_filemanager/tasks/DCVMHelpTask.hpp
     src/dcvm_filemanager/tasks/control/DCVMControlTask.hpp

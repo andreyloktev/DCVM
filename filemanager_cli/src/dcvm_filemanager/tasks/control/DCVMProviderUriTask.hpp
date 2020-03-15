@@ -12,7 +12,7 @@ public:
     void Help(Command &cmd) const override;
     DCVM_ERROR Execute(Command &cmd) const override;
 private:
-    void PrintError(const DCVMString_t &msg) const override;
+    void PrintError(const dcvm::base::DCVMString_t &msg) const override;
     void PrintHelp() const override;
 };
 

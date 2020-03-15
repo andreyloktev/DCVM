@@ -22,6 +22,9 @@ else()
     add_library(${module_name} ${module_sources} ${module_public_headers} ${module_private_headers})
 endif()
 
+set_property(TARGET ${module_name} PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET ${module_name} PROPERTY CXX_STANDARD 17)
+
 target_include_directories(${module_name} PUBLIC "${CMAKE_SOURCE_DIR}/${module_name}/include")
 target_include_directories(${module_name} PRIVATE "${CMAKE_SOURCE_DIR}/${module_name}/src/h")
 
@@ -53,8 +56,10 @@ endif()
 
 if(module_tests)
     add_executable(${module_name}_test ${module_tests})
+    set_property(TARGET ${module_name}_test PROPERTY CXX_STANDARD_REQUIRED ON)
+    set_property(TARGET ${module_name}_test PROPERTY CXX_STANDARD 17)
     enable_testing()
     find_package(GTest REQUIRED)
-    target_link_libraries(${module_name}_test PRIVATE GTest::GTest GTest::Main)
+    target_link_libraries(${module_name}_test PRIVATE ${module_name} GTest::GTest GTest::Main)
     add_test(AllTestsInMain ${module_name}_test)
 endif()

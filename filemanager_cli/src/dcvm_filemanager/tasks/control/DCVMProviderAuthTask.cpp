@@ -49,7 +49,7 @@ void DCVMProviderAuthTask::PrintHelp() const
     DCVM_INFO_TRACE("  code -- authentication code.");
 }
 
-void DCVMProviderAuthTask::PrintError(const DCVMString_t &msg) const
+void DCVMProviderAuthTask::PrintError(const dcvm::base::DCVMString_t &msg) const
 {
     DCVM_INFO_TRACE("Error: %s", msg);
     DCVM_INFO_TRACE("Type HELP CONTROL PROVIDER LIST for usage");

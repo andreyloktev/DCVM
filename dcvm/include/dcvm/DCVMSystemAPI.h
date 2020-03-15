@@ -72,6 +72,7 @@ typedef void (*DCVMMemorySet)(void *pBlock, dcvm_size_t size, dcvm_uint8_t value
 /*!
  * TODO: Need to interact with this function via http context.
  * @brief Send http request and get response.
+ * @warning pResponse buffer must be released via DCVMMemoryFree.
  * @param [in] pMethod http request method.
  * @param [in] pUri operation
  * @param [in] pHeaders array of http request headers. If there are no headers then pHeaders is nullptr.
@@ -96,6 +97,37 @@ typedef enum DCVM_ERROR (*DCVMSendHttpRequest)(
     , struct DCVMContext        *pCtxt
 );
 
+/*!
+ * @brief Random number generator.
+ * @param [in, out] pBuffer input buffer where random bytes will be placed.
+ * @param [in] bufSize input buffer size.
+ * @param [in] pCtxt system context(optional).
+ * @retunr error code.
+*/
+typedef enum DCVM_ERROR (*DCVMCryptoRNG)(
+    dcvm_uint8_t            *pBuffer
+    , const dcvm_size_t     bufSize
+    , struct DCVMContext    *pCtxt
+);
+
+/*!
+ * @brief Get SHA256 hash.
+ * @warning pHashedData buffer must be relased via DCVMMemoryFree
+ * @param [in] pDataToHash pointer to buffer with data to hash.
+ * @param [in] dataToHashSize size of input buffer.
+ * @param [out] ppHashedData buffer with hashed data.
+ * @param [out] pHashedDataSize size of output buffer.
+ * @param [in] pCtxt system context(optional).
+ * @retunr error code.
+*/
+typedef enum DCVM_ERROR (*DCVMCryptoSHA256)(
+    const dcvm_uint8_t      *pDataToHash
+    , const dcvm_size_t     dataToHashSize
+    , dcvm_uint8_t          **ppHashedData
+    , dcvm_size_t           *pHashedDataSize
+    , struct DCVMContext    *pCtxt
+);
+
 #ifdef __cplusplus
 }
 #endif
@@ -108,6 +140,8 @@ typedef struct _DCVMSystemAPI
     DCVMMemoryCopy      MemoryCopy;
     DCVMMemoryCompare   MemoryCompare;
     DCVMSendHttpRequest SendHttpRequest;
+    DCVMCryptoRNG       CryptoRNG;
+    DCVMCryptoSHA256    CryptoSHA256;
 } DCVMSystemAPI;
 
 #endif

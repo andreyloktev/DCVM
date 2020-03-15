@@ -1,5 +1,6 @@
 #include "DCVMWrapper.hpp"
 #include <dcvm/dcvm.h>
+#include <dcvm/cpp/base/dcvm_defines.hpp>
 
 #ifdef WIN32
 #include <system/dcvm_windows.h>
@@ -73,7 +74,7 @@ private:
     dcvm_char_t *m_pBuffer = nullptr;
 };
 
-struct DCVMDeleter final
+struct DCVMHandlerDeleter final
 {
     void operator()(DCVM *pDCVM) const noexcept
     {
@@ -97,7 +98,7 @@ struct DCVMBufferDeleter final
 
 struct DCVMWrapper::Impl final
 {
-    std::unique_ptr<DCVM, DCVMDeleter> m_pDCVM;
+    std::unique_ptr<DCVM, DCVMHandlerDeleter> m_pDCVM;
 
     Impl(DCVM *pDCVM)
     {
@@ -120,6 +121,8 @@ DCVMWrapper::DCVMWrapper() noexcept
         , sys_DCVMMemoryCopy
         , sys_DCVMMemoryCompare
         , sys_DCVMSendHttpRequest
+        , sys_DCVMCryptoRNG
+        , sys_DCVMCryptoSHA256
     };
 
     DCVM *pDCVM = nullptr;
@@ -147,7 +150,7 @@ DCVMWrapper::~DCVMWrapper() noexcept
 {
 }
 
-DCVM_ERROR DCVMWrapper::ControlGetListOfCloudProviders(std::vector<DCVMString_t> &providersIds) const noexcept
+DCVM_ERROR DCVMWrapper::ControlGetListOfCloudProviders(dcvm::base::DCVMVector_t<dcvm::base::DCVMString_t> &providersIds) const noexcept
 {
     if (nullptr == m_pImpl)
     {
@@ -164,25 +167,20 @@ DCVM_ERROR DCVMWrapper::ControlGetListOfCloudProviders(std::vector<DCVMString_t>
         return err;
     }
 
-    try
+    DCVM_BEGIN_CATCH_HANDLER
+    dcvm::base::DCVMUniquePtr_t<dcvm_char_t> pDcvmbuffer(pBuffer);
+    
+    DCVMStringBufferIterator dcvmBufIt(pDcvmbuffer.get(), bufferSize);
+    for (; dcvmBufIt != DCVMStringBufferIterator::End(); dcvmBufIt++)
     {
-        std::unique_ptr<dcvm_char_t> pDcvmbuffer(pBuffer);
-
-        DCVMStringBufferIterator dcvmBufIt(pDcvmbuffer.get(), bufferSize);
-        for (; dcvmBufIt != DCVMStringBufferIterator::End(); dcvmBufIt++)
-        {
-            providersIds.emplace_back(*dcvmBufIt);
-        }
+        providersIds.emplace_back(*dcvmBufIt);
     }
-    catch (std::exception&)
-    {
-        return DCVM_ERR_INTERNAL;
-    }
+    DCVM_END_CATCH_HANDLER
 
     return DCVM_ERR_SUCCESS;
 }
 
-DCVM_ERROR DCVMWrapper::ControlGetAuthorzationUri(const DCVMStringView_t &providerId, DCVMString_t &uri) const noexcept
+DCVM_ERROR DCVMWrapper::ControlGetAuthorzationUri(const dcvm::base::DCVMStringView_t &providerId, dcvm::base::DCVMString_t &uri) const noexcept
 {
     if (nullptr == m_pImpl)
     {
@@ -203,23 +201,18 @@ DCVM_ERROR DCVMWrapper::ControlGetAuthorzationUri(const DCVMStringView_t &provid
         return err;
     }
 
-    try
-    {
-        std::unique_ptr<dcvm_char_t> pUri(pBuffer);
-        uri = pUri.get();
-    }
-    catch (std::exception&)
-    {
-        return DCVM_ERR_INTERNAL;
-    }
+    DCVM_BEGIN_CATCH_HANDLER
+    dcvm::base::DCVMUniquePtr_t<dcvm_char_t> pUri(pBuffer);
+    uri = pUri.get();
+    DCVM_END_CATCH_HANDLER
 
     return DCVM_ERR_SUCCESS;
 }
 
 DCVM_ERROR DCVMWrapper::ControlCreateCloudDisk(
-    const DCVMStringView_t      &providerId
-    , const DCVMStringView_t    &oauthCode
-    , dcvm_size_t               &cloudDiskId
+    const dcvm::base::DCVMStringView_t      &providerId
+    , const dcvm::base::DCVMStringView_t    &oauthCode
+    , dcvm_size_t                           &cloudDiskId
 ) const noexcept
 {
     if (nullptr == m_pImpl)
@@ -243,7 +236,7 @@ DCVM_ERROR DCVMWrapper::ControlCreateCloudDisk(
     return dcvm_ControlCreateCloudDisk(m_pImpl->DCVM(), &clientOauthCode, &cloudDiskId, nullptr);
 }
 
-DCVM_ERROR DCVMWrapper::ControlGetListOfCloudDiskIds(std::vector<dcvm_size_t> &ids) const noexcept
+DCVM_ERROR DCVMWrapper::ControlGetListOfCloudDiskIds(dcvm::base::DCVMVector_t<dcvm_size_t> &ids) const noexcept
 {
     if (nullptr == m_pImpl)
     {
@@ -260,16 +253,11 @@ DCVM_ERROR DCVMWrapper::ControlGetListOfCloudDiskIds(std::vector<dcvm_size_t> &i
         return err;
     }
 
-    std::unique_ptr<dcvm_size_t, DCVMBufferDeleter> pIds(pBuf);
+    dcvm::base::DCVMUniquePtr_t<dcvm_size_t, DCVMBufferDeleter> pIds(pBuf);
 
-    try
-    {
-        ids = std::vector<dcvm_size_t>(pIds.get(), pIds.get() + amountIds);
-    }
-    catch (std::exception&)
-    {
-        return DCVM_ERR_INTERNAL;
-    }
+    DCVM_BEGIN_CATCH_HANDLER
+    ids = dcvm::base::DCVMVector_t<dcvm_size_t>(pIds.get(), pIds.get() + amountIds);
+    DCVM_END_CATCH_HANDLER
 
     return err;
 }
@@ -289,7 +277,7 @@ DCVM_ERROR DCVMWrapper::ControlGetCloudDiskInformation(const dcvm_size_t cloudDi
         return err;
     }
 
-    std::unique_ptr<dcvm_uint8_t[]> pBuf(new(std::nothrow) dcvm_uint8_t[diSize]);
+    dcvm::base::DCVMUniquePtr_t<dcvm_uint8_t> pBuf(dcvm::base::SystemApi::MemoryAllocate<dcvm_uint8_t>(diSize, DCVM_TRUE));
     if (nullptr == pBuf)
     {
         DCVM_ERROR_TRACE(DCVM_ERR_INSUFFICIENT_RESOURCES);
@@ -322,8 +310,19 @@ DCVM_ERROR DCVMWrapper::ControlGetCloudDiskInformation(const dcvm_size_t cloudDi
             }
         }
 
-        std::memcpy(out.providerInfo.id, pDiskInfo->providerInfo.id, sizeof(DCVMCloudProviderInfo::id));
-        std::memcpy(out.userInfo.name, pDiskInfo->userInfo.name, sizeof(DCVMUserInfo::name));
+        dcvm::base::SystemApi::MemoryCopy(
+            out.providerInfo.id
+            , sizeof(DCVMCloudProviderInfo::id)
+            , pDiskInfo->providerInfo.id
+            , sizeof(DCVMCloudProviderInfo::id));
+
+        dcvm::base::SystemApi::MemoryCopy(
+            out.userInfo.name
+            , sizeof(DCVMUserInfo::name)
+            , pDiskInfo->userInfo.name
+            , sizeof(DCVMUserInfo::name)
+        );
+        
         out.maxFileSize = pDiskInfo->maxFileSize;
         out.totalSpace = pDiskInfo->totalSpace;
         out.usedSpace = pDiskInfo->usedSpace;

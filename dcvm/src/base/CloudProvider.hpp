@@ -2,8 +2,8 @@
 #define DCVM_CORE_BASE_CLOUDPROVIDER_HPP_
 
 #include <dcvm/DCVMCloudProviderAPI.h>
-#include "MemoryBase.hpp"
-#include "DCVMTypes.hpp"
+#include <dcvm/cpp/base/MemoryBase.hpp>
+#include <dcvm/cpp/base/DCVMTypes.hpp>
 
 namespace dcvm  {
 namespace base  {

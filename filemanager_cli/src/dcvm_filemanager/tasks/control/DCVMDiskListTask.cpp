@@ -18,7 +18,7 @@ DCVM_ERROR DCVMDiskListTask::Execute(Command &cmd) const
         return DCVM_ERR_BAD_PARAMS;
     }
 
-    std::vector<dcvm_size_t> ids;
+    dcvm::base::DCVMVector_t<dcvm_size_t> ids;
     DCVM_ERROR err = m_dcvm.ControlGetListOfCloudDiskIds(ids);
     if (DCVM_FAILED(err))
     {
@@ -40,7 +40,7 @@ void DCVMDiskListTask::PrintHelp() const
     DCVM_INFO_TRACE("control disk list");
 }
 
-void DCVMDiskListTask::PrintError(const DCVMString_t &msg) const
+void DCVMDiskListTask::PrintError(const dcvm::base::DCVMString_t &msg) const
 {
     DCVM_INFO_TRACE("Error: %s", msg);
     DCVM_INFO_TRACE("Type HELP CONTROL DISK LIST for usage");

@@ -28,7 +28,7 @@ DCVM_ERROR DCVMDiskInfoTask::Execute(Command &cmd) const
     dcvm_size_t diskId = 0;
     try
     {
-        diskId = std::stoll(cmd[0], nullptr, 0);
+        diskId = std::stoll(cmd[0].c_str(), nullptr, 0);
     }
     catch(const std::exception&)
     {
@@ -58,6 +58,8 @@ DCVM_ERROR DCVMDiskInfoTask::Execute(Command &cmd) const
     };
 
     PrintDiskInfo(info, 0);
+
+    return DCVM_ERR_SUCCESS;
 }
 
 void DCVMDiskInfoTask::PrintHelp() const
@@ -69,7 +71,7 @@ void DCVMDiskInfoTask::PrintHelp() const
     DCVM_INFO_TRACE("  id -- cloud disk id.");
 }
 
-void DCVMDiskInfoTask::PrintError(const DCVMString_t &msg) const
+void DCVMDiskInfoTask::PrintError(const dcvm::base::DCVMString_t &msg) const
 {
     DCVM_INFO_TRACE("Error: %s", msg);
     DCVM_INFO_TRACE("Type HELP CONTROL DISK INFO for usage");

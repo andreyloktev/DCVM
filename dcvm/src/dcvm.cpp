@@ -4,9 +4,9 @@
 
 #include <dcvm/dcvm.h>
 #include <dcvm/DCVMLogger.h>
-#include "base/DCVMTypes.hpp"
-#include "base/MemoryBase.hpp"
-#include "base/SystemApi.hpp"
+#include <dcvm/cpp/base/DCVMTypes.hpp>
+#include <dcvm/cpp/base/MemoryBase.hpp>
+#include <dcvm/cpp/base/SystemApi.hpp>
 #include "CloudDiskManager/CloudDiskManager.hpp"
 
 namespace dcvm {
@@ -27,7 +27,7 @@ dcvm_char_t* CopyDCVMString(const base::DCVMStringView_t &str) noexcept
 {
     const auto STR_SIZE = SIZE_OF_DCVMSTRING(str);
 
-    dcvm_char_t *pStr = static_cast<dcvm_char_t*>(base::SystemApi::MemoryAllocate(STR_SIZE, DCVM_TRUE));
+    dcvm_char_t *pStr = base::SystemApi::MemoryAllocate<dcvm_char_t>(STR_SIZE, DCVM_TRUE);
     if (nullptr == pStr)
     {
         return pStr;
@@ -165,7 +165,7 @@ extern "C"
 
         const auto BUFFER_SIZE = CalculateBufferSizeForClientsList(providers);
 
-        auto *pBuffer = static_cast<dcvm_char_t*>(dcvm::base::SystemApi::MemoryAllocate(BUFFER_SIZE, DCVM_TRUE));
+        auto *pBuffer = dcvm::base::SystemApi::MemoryAllocate<dcvm_char_t>(BUFFER_SIZE, DCVM_TRUE);
 
         if (nullptr == pBuffer)
         {
@@ -248,7 +248,7 @@ extern "C"
         }
 
         const dcvm_size_t BUFFER_SIZE = ids.size() * sizeof(dcvm_size_t);
-        dcvm_size_t *pBuffer = static_cast<dcvm_size_t*>(dcvm::base::SystemApi::MemoryAllocate(BUFFER_SIZE, DCVM_TRUE));
+        dcvm_size_t *pBuffer = dcvm::base::SystemApi::MemoryAllocate<dcvm_size_t>(BUFFER_SIZE, DCVM_TRUE);
         if (nullptr == pBuffer)
         {
             DCVM_ERROR_TRACE(DCVM_ERR_INSUFFICIENT_RESOURCES);

@@ -55,6 +55,8 @@ endif()
 
 if(module_tests)
     add_executable(${module_name}_test ${module_tests})
+    set_property(TARGET ${module_name}_test PROPERTY CXX_STANDARD_REQUIRED ON)
+    set_property(TARGET ${module_name}_test PROPERTY CXX_STANDARD 17)
     enable_testing()
     find_package(GTest REQUIRED)
     target_link_libraries(${module_name}_test PRIVATE ${module_name} GTest::GTest GTest::Main)

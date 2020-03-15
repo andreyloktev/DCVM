@@ -26,7 +26,7 @@ DCVM_ERROR DCVMProviderUriTask::Execute(Command &cmd) const
         return DCVM_ERR_BAD_PARAMS;
     }
 
-    DCVMString_t uri;
+    dcvm::base::DCVMString_t uri;
     DCVM_ERROR err = m_dcvm.ControlGetAuthorzationUri(cmd[0].c_str(), uri);
     if (DCVM_SUCCESS(err))
     {
@@ -36,9 +36,9 @@ DCVM_ERROR DCVMProviderUriTask::Execute(Command &cmd) const
     return err;
 }
 
-void DCVMProviderUriTask::PrintError(const DCVMString_t &msg) const
+void DCVMProviderUriTask::PrintError(const dcvm::base::DCVMString_t &msg) const
 {
-    DCVM_INFO_TRACE("Error: %s", msg);
+    DCVM_INFO_TRACE("Error: %s", msg.c_str());
     DCVM_INFO_TRACE("Type HELP CONTROL PROVIDER URI for usage");
 }
 

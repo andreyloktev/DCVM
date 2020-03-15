@@ -28,11 +28,11 @@ PTask DCVMControlTask::Generate(Command &cmd) const
 
     if (DCVM_TEXT("provider") == controlCmd)
     {
-        return std::make_shared<DCVMProviderTask>(m_dcvm);
+        return dcvm::base::DCVMMakeShared<DCVMProviderTask>(m_dcvm);
     }
     else if (DCVM_TEXT("disk") == controlCmd)
     {
-        return std::make_shared<DCVMDiskTask>(m_dcvm);
+        return dcvm::base::DCVMMakeShared<DCVMDiskTask>(m_dcvm);
     }
 
     return nullptr;

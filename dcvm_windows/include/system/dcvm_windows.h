@@ -29,6 +29,16 @@ enum DCVM_ERROR sys_DCVMSendHttpRequest(
     , struct DCVMContext        *pCtxt
 );
 
+enum DCVM_ERROR sys_DCVMCryptoRNG(dcvm_uint8_t *pBuffer, const dcvm_size_t bufSize, struct DCVMContext *pCtxt);
+
+enum DCVM_ERROR sys_DCVMCryptoSHA256(
+    const dcvm_uint8_t      *pDataToHash
+    , const dcvm_size_t     dataToHashSize
+    , dcvm_uint8_t          **ppHashedData
+    , dcvm_size_t           *pHashedDataSize
+    , struct DCVMContext    *pCtxt
+);
+
 #ifdef __cplusplus
 }
 #endif

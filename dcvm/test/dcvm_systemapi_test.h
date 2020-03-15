@@ -14,7 +14,7 @@ extern "C"
 
     void DCVMMemoryCopy_test(void *pDst, dcvm_size_t dstSize,  const void *pSrc, dcvm_size_t srcSize);
 
-    dcvm_int32_t DCVMMemoryCompare_test(void *pBlock1, const void *pBlock2, dcvm_size_t bytesToCmp);
+    dcvm_int32_t DCVMMemoryCompare_test(const void *pBlock1, const void *pBlock2, dcvm_size_t bytesToCmp);
 
     void DCVMMemorySet_test(void *pBlock, dcvm_size_t size, dcvm_uint8_t value);
 

@@ -25,11 +25,11 @@ PTask DCVMDiskTask::Generate(Command &cmd) const
 
     if (DCVM_TEXT("list") == diskCmd)
     {
-        return std::make_shared<DCVMDiskListTask>(m_dcvm);
+        return dcvm::base::DCVMMakeShared<DCVMDiskListTask>(m_dcvm);
     }
     else if (DCVM_TEXT("info") == diskCmd)
     {
-        return std::make_shared<DCVMDiskInfoTask>(m_dcvm);
+        return dcvm::base::DCVMMakeShared<DCVMDiskInfoTask>(m_dcvm);
     }
 
     return nullptr;

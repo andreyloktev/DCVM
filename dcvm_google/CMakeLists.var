@@ -1,0 +1,39 @@
+
+# Module name (REQUIRED)
+set(module_name dcvm_google)
+
+# Module type(library or executable. Default is library)
+set(module_type library)
+
+# Public module headers
+set(module_public_headers
+    include/dcvm/provider/dcvm_google.h
+)
+
+# Private module headers
+set(module_private_headers
+    src/DCVMGoogleCloudProvider.hpp
+)
+
+# Module sources
+set(module_sources
+    src/dcvm_google.cpp
+    src/DCVMGoogleCloudProvider.cpp
+)
+
+# Module defines
+set(module_defines
+)
+
+#Module tests
+set(module_tests
+)
+
+# Module dependency
+set(module_dependency
+    dcvm_provider
+)
+
+# Module external dependency(get via vcpkg)
+set(module_external_dependency
+)

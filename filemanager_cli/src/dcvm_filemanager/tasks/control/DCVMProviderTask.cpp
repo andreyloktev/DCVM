@@ -27,15 +27,15 @@ PTask DCVMProviderTask::Generate(Command &cmd) const
 
     if (DCVM_TEXT("uri") == controlCmd)
     {
-        return std::make_shared<DCVMProviderUriTask>(m_dcvm);
+        return dcvm::base::DCVMMakeShared<DCVMProviderUriTask>(m_dcvm);
     }
     else if (DCVM_TEXT("auth") == controlCmd)
     {
-        return std::make_shared<DCVMProviderAuthTask>(m_dcvm);
+        return dcvm::base::DCVMMakeShared<DCVMProviderAuthTask>(m_dcvm);
     }
     else if (DCVM_TEXT("list") == controlCmd)
     {
-        return std::make_shared<DCVMProviderListTask>(m_dcvm);
+        return dcvm::base::DCVMMakeShared<DCVMProviderListTask>(m_dcvm);
     }
 
     return nullptr;

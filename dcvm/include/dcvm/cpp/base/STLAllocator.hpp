@@ -43,14 +43,14 @@ public:
 
     pointer allocate(size_type n, const_pointer hint = 0) noexcept
     {
-        return static_cast<pointer>(::malloc(sizeof(T) * n));
+        return SystemApi::MemoryAllocate<T>(sizeof(T) * n, DCVM_FALSE);
     }
 
     void deallocate(pointer p, size_type n) noexcept
     {
         if (p)
         {
-            ::free(p);
+            SystemApi::MemoryFree(p);
         }
     }
 

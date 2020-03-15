@@ -38,7 +38,7 @@ extern "C"
         std::memcpy(pDst, pSrc, srcSize > dstSize ? dstSize : srcSize);
     }
 
-    dcvm_int32_t DCVMMemoryCompare_test(void *pBlock1, const void *pBlock2, dcvm_size_t bytesToCmp) noexcept
+    dcvm_int32_t DCVMMemoryCompare_test(const void *pBlock1, const void *pBlock2, dcvm_size_t bytesToCmp) noexcept
     {
         if ((nullptr == pBlock1) && (nullptr == pBlock2))
         {

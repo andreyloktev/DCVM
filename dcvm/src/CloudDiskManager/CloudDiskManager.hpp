@@ -3,8 +3,8 @@
 
 #include <dcvm/DCVMError.h>
 #include <dcvm/DCVMCloudProviderAPI.h>
-#include "../base/DCVMTypes.hpp"
-#include "../base/MemoryBase.hpp"
+#include <dcvm/cpp/base/DCVMTypes.hpp>
+#include <dcvm/cpp/base/MemoryBase.hpp>
 #include "../base/CloudProvider.hpp"
 #include "../CloudDisk/ICloudDisk.hpp"
 

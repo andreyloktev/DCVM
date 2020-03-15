@@ -10,6 +10,8 @@
 #include <EASTL/unordered_map.h>
 #include <EASTL/map.h>
 #include "EASTLAllocator.hpp"
+#include <EASTL/unique_ptr.h>
+#include <EASTL/shared_ptr.h>
 #else
 #include <string>
 #include <string_view>
@@ -17,10 +19,22 @@
 #include <unordered_map>
 #include <map>
 #include "STLAllocator.hpp"
+#include <memory>
 #endif
 
 namespace dcvm {
 namespace base {
+
+struct DCVMDeleter final
+{
+    void operator()(void *p) noexcept
+    {
+        if (p)
+        {
+            SystemApi::MemoryFree(p);
+        }
+    }
+};
 
 #ifdef DCVM_USE_EASTL
 
@@ -94,6 +108,12 @@ using DCVMPair_t = eastl::pair<First, Second>;
 
 template <typename Key, typename T>
 using DCVMMap_t = eastl::map<Key, T, eastl::equal_to<Key>, EASTLAllocator>;
+
+template <typename T, typename Deleter = DCVMDeleter>
+using DCVMUniquePtr_t = eastl::unique_ptr<T, Deleter>;
+
+template <typename T>
+using DCVMSharedPtr_t = eastl::shared_ptr<T>;
 
 #else
 
@@ -184,7 +204,14 @@ using DCVMMap_t = std::map<
     , STLAllocator<DCVMPair_t<const Key, T>>
 >;
 
+template <typename T, typename Deleter = DCVMDeleter>
+using DCVMUniquePtr_t = std::unique_ptr<T, Deleter>;
+
+template <typename T>
+using DCVMSharedPtr_t = std::shared_ptr<T>;
+
 #endif
+
 
 } // namespace base
 } // namespcae dcvm

@@ -2,8 +2,8 @@
 #define DCVM_CORE_CLOUDDSIK_ICLOUDDISK_HPP_
 
 #include <dcvm/DCVMError.h>
-#include "../base/DCVMTypes.hpp"
-#include "../base/MemoryBase.hpp"
+#include <dcvm/cpp/base/DCVMTypes.hpp>
+#include <dcvm/cpp/base/MemoryBase.hpp>
 #include "../base/ICloudDiskUnknown.hpp"
 #include <dcvm/DCVMCloudProviderAPI.h>
 #include "objects/CloudDiskDirectory.hpp"

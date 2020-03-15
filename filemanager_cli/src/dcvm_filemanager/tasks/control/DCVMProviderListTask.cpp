@@ -19,7 +19,7 @@ DCVM_ERROR DCVMProviderListTask::Execute(Command &cmd) const
         return DCVM_ERR_BAD_PARAMS;
     }
 
-    std::vector<DCVMString_t> providersIds;
+    dcvm::base::DCVMVector_t<dcvm::base::DCVMString_t> providersIds;
     DCVM_ERROR err = m_dcvm.ControlGetListOfCloudProviders(providersIds);
     if (DCVM_FAILED(err))
     {
@@ -41,7 +41,7 @@ void DCVMProviderListTask::PrintHelp() const
     DCVM_INFO_TRACE("control provider list");
 }
 
-void DCVMProviderListTask::PrintError(const DCVMString_t &msg) const
+void DCVMProviderListTask::PrintError(const dcvm::base::DCVMString_t &msg) const
 {
     DCVM_INFO_TRACE("Error: %s", msg);
     DCVM_INFO_TRACE("Type HELP CONTROL PROVIDER LIST for usage");

@@ -2,7 +2,7 @@
 #define DCVM_CLOUDDSIK_OBJECTS_CLOUDDISKOBJECT_HPP_
 
 #include <dcvm/DCVMCloudProviderAPI.h>
-#include "../../base/MemoryBase.hpp"
+#include <dcvm/cpp/base/MemoryBase.hpp>
 #include "../../base/ICloudDiskUnknown.hpp"
 
 namespace dcvm      {

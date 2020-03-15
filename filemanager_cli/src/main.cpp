@@ -19,7 +19,7 @@ using namespace dcvm_filemanager_cli;
 
 
 DCVM_ERROR Execute(DCVMWrapper &dcvm, Command &cmd);
-Command GenerateCommands(const DCVMString_t &cmd);
+Command GenerateCommands(const dcvm::base::DCVMString_t &cmd);
 
 void DCVMCliPrintError(enum DCVM_ERROR err, const char *pSrcFile, unsigned long line);
 void DCVMCliPrintInfo(const dcvm_char_t *pFmt, ...);
@@ -30,7 +30,7 @@ void main(int argc, dcvm_char_t **ppArgv)
 
     DCVMWrapper dcvm;
 
-    DCVMString_t cmdStr;
+    dcvm::base::DCVMString_t cmdStr;
     DCVMCout << DCVM_TEXT("DCVM> ");
     while (std::getline(DCVMCin, cmdStr))
     {
@@ -102,7 +102,7 @@ DCVM_ERROR Execute(DCVMWrapper &dcvm, Command &cmd)
     return pHelpTask->Execute(Command{});
 }
 
-Command GenerateCommands(const DCVMString_t &cmd)
+Command GenerateCommands(const dcvm::base::DCVMString_t &cmd)
 {
     if (cmd.empty())
     {
@@ -110,10 +110,10 @@ Command GenerateCommands(const DCVMString_t &cmd)
     }
 
     bool bDoubleQuotes = false;
-    DCVMString_t::size_type fromPos = 0;
+    dcvm::base::DCVMString_t::size_type fromPos = 0;
     Command args{};
 
-    DCVMString_t::size_type i = 0;
+    dcvm::base::DCVMString_t::size_type i = 0;
     for(; i < cmd.length(); i++)
     {
         if (!bDoubleQuotes && DCVM_TEXT('\x20') == cmd[i])

@@ -7,6 +7,12 @@
 #include <cpprest/http_client.h>
 #include <cpprest/streams.h>
 
+#include <openssl/err.h>
+#include <openssl/rand.h>
+#include <openssl/sha.h>
+
+#include <Windows.h>
+
 namespace dcvm_win {
 
 inline web::http::method ToCppRestMethod(DCVMHttpMethod method) noexcept
@@ -166,5 +172,81 @@ enum DCVM_ERROR sys_DCVMSendHttpRequest(
         return DCVM_ERR_CANNOT_SEND_REQUEST;
     }
 }
+
+enum DCVM_ERROR sys_DCVMCryptoRNG(dcvm_uint8_t *pBuffer, const dcvm_size_t bufSize, struct DCVMContext *pCtxt)
+{
+    DCVM_UNREFERENCED_PARAMETER(pCtxt);
+
+    if ((nullptr == pBuffer) && (bufSize != 0))
+    {
+        DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
+        return DCVM_ERR_BAD_PARAMS;
+    }
+
+    if (0 == bufSize)
+    {
+        return DCVM_ERR_SUCCESS;
+    }
+
+    // Based on the article https://wiki.openssl.org/index.php/Random_Numbers
+
+    static bool bInitialized = false;
+
+    if (!bInitialized)
+    {
+        RAND_poll();
+        bInitialized = true;
+    }
+
+    int rc = RAND_bytes(pBuffer, static_cast<int>(bufSize));
+    if(rc != 1)
+    {
+        unsigned long err = ERR_get_error();
+
+        DCVM_INFO_TRACE("Can not generate random sequence of bytes. Error is 0x%X", err);
+        DCVM_ERROR_TRACE(DCVM_ERR_CRYPTO);
+        return DCVM_ERR_CRYPTO;
+    }
+
+    //Reseed
+    RAND_seed(pBuffer, static_cast<int>(bufSize));
+    return DCVM_ERR_SUCCESS;
+}
+
+enum DCVM_ERROR sys_DCVMCryptoSHA256(
+    const dcvm_uint8_t      *pDataToHash
+    , const dcvm_size_t     dataToHashSize
+    , dcvm_uint8_t          **ppHashedData
+    , dcvm_size_t           *pHashedDataSize
+    , struct DCVMContext    *pCtxt
+)
+{
+    if (
+        ((nullptr == pDataToHash) && (0 != dataToHashSize))
+        || (nullptr == ppHashedData)
+        || (nullptr == pHashedDataSize)
+    )
+    {
+        DCVM_ERROR_TRACE(DCVM_ERR_BAD_PARAMS);
+        return DCVM_ERR_BAD_PARAMS;
+    }
+
+    DCVM_UNREFERENCED_PARAMETER(pCtxt);
+
+    dcvm_size_t shaDigestLength = SHA256_DIGEST_LENGTH;
+    
+    *ppHashedData = static_cast<unsigned char*>(sys_DCVMMemoryAlloc(shaDigestLength, DCVM_FALSE));
+    if (nullptr == *ppHashedData)
+    {
+        DCVM_ERROR_TRACE(DCVM_ERR_INTERNAL);
+        return DCVM_ERR_INTERNAL;
+    }
+
+    SHA256(pDataToHash, dataToHashSize, *ppHashedData);
+    *pHashedDataSize = shaDigestLength;
+
+    return DCVM_ERR_SUCCESS;
+}
+
 
 } // extern "C"

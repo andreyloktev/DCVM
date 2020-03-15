@@ -1,0 +1,37 @@
+
+# Module name (REQUIRED)
+set(module_name dcvm_provider)
+
+# Module type(library or executable. Default is library)
+set(module_type library)
+
+# Public module headers
+set(module_public_headers
+    include/dcvm/provider/DCVMCryptoHelper.hpp
+    include/dcvm/provider/DCVMCloudProvider.hpp
+)
+
+# Module sources
+set(module_sources
+    src/DCVMCryptoHelper.cpp
+)
+
+# Module defines
+set(module_defines
+)
+
+#Module tests
+set(module_tests
+    test/dcvm_systemapi_test.h
+    test/dcvm_systemapi_test.cpp
+    test/dcvmcryptohelper_utest.cpp
+)
+
+# Module dependency
+set(module_dependency
+    dcvm
+)
+
+# Module external dependency(get via vcpkg)
+set(module_external_dependency
+)

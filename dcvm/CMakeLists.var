@@ -13,19 +13,19 @@ set(module_public_headers
     include/dcvm/DCVMTypes.h
     include/dcvm/DCVMCloudProviderAPI.h
     include/dcvm/DCVMSystemAPI.h
+    include/dcvm/cpp/base/dcvm_defines.hpp
+    include/dcvm/cpp/base/DCVMFunctions.hpp
+    include/dcvm/cpp/base/DCVMTypes.hpp
+    include/dcvm/cpp/base/EASTLAllocator.hpp
+    include/dcvm/cpp/base/MemoryBase.hpp
+    include/dcvm/cpp/base/NameValuePair.hpp
+    include/dcvm/cpp/base/STLAllocator.hpp
+    include/dcvm/cpp/base/SystemApi.hpp
 )
 
 # Private module headers
 set(module_private_headers
-    src/base/dcvm_defines.hpp
-    src/base/DCVMTypes.hpp
-    src/base/DCVMFunctions.hpp
-    src/base/EASTLAllocator.hpp
-    src/base/STLAllocator
     src/base/ICloudDiskUnknown.hpp
-    src/base/MemoryBase.hpp
-    src/base/NameValuePair.hpp
-    src/base/SystemApi.hpp
     src/base/CloudProvider.hpp
     src/clouddisk/objects/CloudDiskDirectory.hpp
     src/clouddisk/objects/CloudDiskFile.hpp
