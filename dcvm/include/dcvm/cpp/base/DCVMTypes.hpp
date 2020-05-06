@@ -40,6 +40,10 @@ struct DCVMDeleter final
 
 using DCVMString_t = eastl::basic_string<dcvm_char_t, EASTLAllocator>;
 
+using DCVMUtf8String_t    = eastl::basic_string<char, EASTLAllocator>;
+
+using DCVMUtf16String_t   = eastl::basic_string<wchar_t, EASTLAllocator>;
+
 using DCVMStringView_t = eastl::string_view<dcvm_char_t>;
 
 template <typename T>
@@ -122,6 +126,10 @@ using DCVMString_t = std::basic_string<
     , std::char_traits<dcvm_char_t>
     , STLAllocator<dcvm_char_t>
 >;
+
+using DCVMUtf8String_t    = std::basic_string<char, std::char_traits<char>, STLAllocator<char>>;
+
+using DCVMUtf16String_t   = std::basic_string<wchar_t, std::char_traits<wchar_t>, STLAllocator<wchar_t>>;
 
 using DCVMStringView_t = std::basic_string_view<
     dcvm_char_t

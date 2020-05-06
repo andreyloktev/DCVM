@@ -9,11 +9,15 @@ set(module_type library)
 set(module_public_headers
     include/dcvm/provider/DCVMCryptoHelper.hpp
     include/dcvm/provider/DCVMCloudProvider.hpp
+    include/dcvm/provider/utilities/DCVMUriBuilder.hpp
+    include/dcvm/provider/utilities/conversions/DCVMConversions.hpp
 )
 
 # Module sources
 set(module_sources
     src/DCVMCryptoHelper.cpp
+    src/utilities/DCVMUriBuilder.cpp
+    src/utilities/conversions/DCVMConversions.cpp
 )
 
 # Module defines
@@ -25,6 +29,8 @@ set(module_tests
     test/dcvm_systemapi_test.h
     test/dcvm_systemapi_test.cpp
     test/dcvmcryptohelper_utest.cpp
+    test/dcvmuribuilder_utest.cpp
+    test/dcvmconversions_utest.cpp
 )
 
 # Module dependency

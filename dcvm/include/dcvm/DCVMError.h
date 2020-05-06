@@ -29,6 +29,8 @@ enum DCVM_ERROR
     , DCVM_ERR_FILE_IS_NOT_DIRECTORY                        = MAKE_DCVM_ERROR(0xc)
     , DCVM_ERR_CANNOT_SEND_REQUEST                          = MAKE_DCVM_ERROR(0xd)
     , DCVM_ERR_CRYPTO                                       = MAKE_DCVM_ERROR(0xe)
+    , DCVM_ERR_UTF16_TO_UTF8_ERROR                          = MAKE_DCVM_ERROR(0xf)
+    , DCVM_ERR_UTF8_TO_UTF16_ERROR                          = MAKE_DCVM_ERROR(0x10)
 };
 
 const char* DCVMErrorToString(enum DCVM_ERROR err);

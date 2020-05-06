@@ -12,6 +12,8 @@ typedef char dcvm_char_t;
 #define DCVM_TRUE   1
 #define DCVM_FALSE  0
 
+#define DCVM_UCHAR_MAX 0xff
+
 typedef unsigned char       dcvm_bool_t;
 
 typedef unsigned char       dcvm_uint8_t;
